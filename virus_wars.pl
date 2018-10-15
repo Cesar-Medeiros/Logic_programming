@@ -34,8 +34,15 @@ symbol('bAliv', '⨉'). %X
 symbol('bDead', '●'). %.
 
 
-main :- tab2(Tab), printTab(Tab).
+main :- tab2(Tab), game(Tab, 0).
 
+%game(Tab, _) :- endGame(Tab, N). 
+
+game(Tab, Player) :- makeMove(Tab, Player, TabOut, PlayerOut), printTab(TabOut), verifyEnd(), game(TabOut, PlayerOut).
+
+makeMove(Tab, Player, TabOut, PlayerOut) :- TabOut = Tab, PlayerOut is (Player + 1) mod 2.
+
+verifyEnd() :- get_char(X), X \= 'e'.
 
 /*
 Print board functions
