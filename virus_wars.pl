@@ -34,15 +34,19 @@ symbol('bAliv', '⨉').
 symbol('bDead', '●'). 
 
 
-main :- tab2(Tab), printTab(Tab). %game(Tab, 0).
+main :- tab2(Tab), game(Tab, 0).
 
-%game(Tab, _) :- endGame(Tab, N). 
+game(_, _) :- verifyEnd().
+game(Tab, Player) :- 
+				makeMove(Tab, Player, TabOut, PlayerOut),
+				printTab(TabOut),
+				game(TabOut, PlayerOut).
 
-game(Tab, Player) :- makeMove(Tab, Player, TabOut, PlayerOut), printTab(TabOut), verifyEnd(), game(TabOut, PlayerOut).
+makeMove(Tab, Player, TabOut, PlayerOut) :- 
+				TabOut = Tab, 
+				PlayerOut is (Player + 1) mod 2.
 
-makeMove(Tab, Player, TabOut, PlayerOut) :- TabOut = Tab, PlayerOut is (Player + 1) mod 2.
-
-verifyEnd() :- get_char(X), X \= 'e'.
+verifyEnd() :- get_char(X), X == 'e'.
 
 
 
