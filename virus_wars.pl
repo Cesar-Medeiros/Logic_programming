@@ -27,14 +27,14 @@ tab2([
 
 
 
-symbol('empty',' ').
-symbol('rAliv', '◯'). %O
-symbol('rDead', '⨂'). %E
-symbol('bAliv', '⨉'). %X
-symbol('bDead', '●'). %.
+symbol('empty', ' ').
+symbol('rAliv', '◯').
+symbol('rDead', '⨂').
+symbol('bAliv', '⨉').
+symbol('bDead', '●'). 
 
 
-main :- tab2(Tab), game(Tab, 0).
+main :- tab2(Tab), printTab(Tab). %game(Tab, 0).
 
 %game(Tab, _) :- endGame(Tab, N). 
 
@@ -51,25 +51,38 @@ verifyEnd() :- get_char(X), X \= 'e'.
 Print board functions
 */
 
-printTab(Tab) :- printTab_Begin(Tab).
+printTab(Tab) :- length(Tab, N), printTab_Begin(Tab, N).
 
-printTab_Begin([L | T]) :- 
-				printChar(' ', 4), 
-				printFirstLine_Begin(L), 
-				printLine(L), 
-				printTab_Middle(T).
+printTab_Begin([L | T], N) :- 
+			printChar(' ', 4),
+			printFirstLine_Begin(L),
+			number_string(N, S),
+			writef('%3r ', [S]),
+			N1 is N - 1,
+			printLine(L), 
+			printTab_Middle(T , N1).
 
-printTab_Middle([L | T]) :- 
-				printSeparationLine(L),
-				printLine(L),
-				printTab_Middle(T).
 
-printTab_Middle([]) :- printTab_End().
+printTab_Middle([L | T], N) :- 
+			printChar(' ', 4),
+			printSeparationLine(L),
+			number_string(N, S),
+			writef('%3r ', [S]),
+			N1 is N - 1,
+			printLine(L),
+			printTab_Middle(T, N1).
 
-printTab_End() :- 
-				tab2([L | _]), 
-				printFinalLine(L),
-				printCoordsLine(L).
+
+printTab_Middle([], _) :- 
+			printTab_End().
+
+
+printTab_End() :- 		
+			printChar(' ', 4), 
+			tab2([L | _]), 
+			printFinalLine(L),
+			printChar(' ', 4),
+			printCoordsLine(L).
 
 
 
@@ -89,94 +102,84 @@ printLine_Middle([C | L]) :-
 				put_char(' '),
 				printLine_Middle(L).
 
-printLine_Middle([]):- printLine_End().
-printLine_End() :- put_code(9475), nl.
+printLine_Middle([]):- 		printLine_End().
+printLine_End() :- 		put_code(9475), nl.
 
 
-printCell(C) :- symbol(C,V), put_code(V).
+printCell(C) :- 		symbol(C,V), put_code(V).
 
 
 /*
 Decoration Functions
 */
 
-printFirstLine(L) :- printFirstLine_Begin(L).
+printFirstLine(L) :- 		printFirstLine_Begin(L).
 
 printFirstLine_Begin([_ | L])  :- 
-					put_code(9487),
-					put_code(9473),
-					put_code(9473),
-					put_code(9473),
-					printFirstLine_Middle(L).
+				printChar('┏', 1),
+				printChar('━', 3),
+				printFirstLine_Middle(L).
 
 printFirstLine_Middle([_ | L]) :- 
-					put_code(9519),
-					put_code(9473),
-					put_code(9473),
-					put_code(9473),
-					printFirstLine_Middle(L).
+				printChar('┯', 1),
+				printChar('━', 3),
+				printFirstLine_Middle(L).
 
-printFirstLine_Middle([]) :- printFirstLine_End().
+printFirstLine_Middle([]) :- 	printFirstLine_End().
 
-printFirstLine_End() :- put_code(9491), nl.
+printFirstLine_End() :- 	printChar('┓', 1), nl.
 
 
 
 printSeparationLine(L) :- printSeparationLine_Begin(L).
 
 printSeparationLine_Begin([_ | L]) :- 
-					put_code(9504),
-					put_code(9472),
-					put_code(9472),
-					put_code(9472),
-					printSeparationLine_Middle(L).
+				printChar('┠', 1),
+				printChar('─', 3),
+				printSeparationLine_Middle(L).
 
 printSeparationLine_Middle([_ | L]) :-
-					put_code(9532),
-					put_code(9472),
-					put_code(9472),
-					put_code(9472),
-					printSeparationLine_Middle(L).
+				printChar('┼', 1),
+				printChar('─', 3),
+				printSeparationLine_Middle(L).
 
 printSeparationLine_Middle([]) :- printSeparationLine_End().
-printSeparationLine_End() :- put_code(9512), nl.
+printSeparationLine_End() :- printChar('┨', 1), nl.
 
 
 printFinalLine(L) :- printFinalLine_Begin(L).
 printFinalLine_Begin([_ | L])  :- 
-					put_code(9495),
-					put_code(9473),
-					put_code(9473),
-					put_code(9473),
-					printFinalLine_Middle(L).
+				printChar('┗', 1),
+				printChar('━', 3),
+				printFinalLine_Middle(L).
 
 printFinalLine_Middle([_ | L]) :- 
-					put_code(9527),
-					put_code(9473),
-					put_code(9473),
-					put_code(9473),
-					printFinalLine_Middle(L).
+				printChar('┷', 1),
+				printChar('━', 3),
+				printFinalLine_Middle(L).
 
 printFinalLine_Middle([]) :- printFinalLine_End().
 
-printFinalLine_End() :- put_code(9499), nl.
+printFinalLine_End() :- printChar('┛', 1), nl.
 
 
 printCoordsLine(L) :- printCoordsLine_Aux(L, 97).
 
 printCoordsLine_Aux([_ | L], N) :- 
-					put_char(' '),
-					put_char(' '),
-					put_code(N),
-					put_char(' '),
-					N1 is N + 1,
-					printCoordsLine_Aux(L, N1).
+				printChar(' ', 2),
+				put_code(N),
+				printChar(' ', 1),
+				N1 is N + 1,
+				printCoordsLine_Aux(L, N1).
 
 printCoordsLine_Aux([], _) :- nl.
 
+
+
+
 printChar(_, 0).
 printChar(C, N) :- 
-					put_char(C),
-					N1 is N - 1,
-					printChar(C, N1).
+				put_char(C),
+				N1 is N - 1,
+				printChar(C, N1).
 
