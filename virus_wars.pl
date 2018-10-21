@@ -1,4 +1,4 @@
-tab1([
+board_begin([
 	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
 	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
 	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
@@ -12,7 +12,7 @@ tab1([
     ]).
 
 
-tab2([
+board_play([
 	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bAliv', 'bAliv', 'bDead', 'bDead'],
 	['empty', 'empty', 'empty', 'empty', 'rDead', 'bDead', 'bDead', 'empty', 'empty', 'rDead'],
 	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead'],
@@ -25,99 +25,119 @@ tab2([
 	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty']
     ]).
 
+board_final([
+	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bAliv', 'bAliv', 'bDead', 'bDead'],
+	['empty', 'empty', 'empty', 'empty', 'rDead', 'bDead', 'bDead', 'empty', 'empty', 'rDead'],
+	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead'],
+	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead', 'bDead', 'bDead'],
+	['empty', 'empty', 'empty', 'rDead', 'rDead', 'bDead', 'bDead', 'rDead', 'empty', 'empty'],
+	['empty', 'empty', 'empty', 'rDead', 'rDead', 'bDead', 'bDead', 'rDead', 'empty', 'rDead'],
+	['empty', 'rAliv', 'bDead', 'rDead', 'rDead', 'bDead', 'rDead', 'empty', 'empty', 'empty'],
+	['empty', 'rAliv', 'rDead', 'rDead', 'empty', 'bDead', 'empty', 'empty', 'empty', 'empty'],
+	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
+	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty']
+    ]).
+
+% board(+Board)
+%   Select a Board to start the game with
+board(Board) :- board_begin(Board).
+
+% main - succeeds when game ends;
+%   board "global variable" must have empty board
+main :- board(Board), game(Board, 0).
 
 
-symbol('empty', ' ').
-symbol('rAliv', '◯').
-symbol('rDead', '⨂').
-symbol('bAliv', '⨉').
-symbol('bDead', '●'). 
-
-
-main :- tab2(Tab), game(Tab, 0).
-
+% game(+Board, +Player) - main game cycle.
+%   Responsible for making moves and printing the board
 game(_, _) :- verifyEnd().
-game(Tab, Player) :- 
-				makeMove(Tab, Player, TabOut, PlayerOut),
-				printTab(TabOut),
-				game(TabOut, PlayerOut).
+game(Board, Player) :- 
+				makeMove(Board, Player, BoardOut, PlayerOut),
+				display_game(BoardOut, PlayerOut),
+				game(BoardOut, PlayerOut).
 
-makeMove(Tab, Player, TabOut, PlayerOut) :- 
-				TabOut = Tab, 
+% makeMove(+Board, +Player, -BoardOut, -PlayerOut)
+%   Responsible for making a move and return the next board and player
+makeMove(Board, Player, BoardOut, PlayerOut) :- 
+				BoardOut = Board, 
 				PlayerOut is (Player + 1) mod 2.
 
-verifyEnd() :- get_char(X), X == 'e'.
+% verifyEnd() - end game
+%  Exit game on user input 'e'
+verifyEnd() :- write('Press \'e\' to exit: '), get_char(X), X == 'e'.
 
 
+% display_game(+Board)
+%   Responsible for printing the board
+display_game(Board,_Player) :- 
+			length(Board, N), 
+			printBoard_Begin(Board, N).
 
-
-/*
-Print board functions
-*/
-
-printTab(Tab) :- length(Tab, N), printTab_Begin(Tab, N).
-
-printTab_Begin([L | T], N) :- 
+% printBoard_Begin(+Board, +RowNumber)
+%   Aux function to print first line formated
+printBoard_Begin([L | T], N) :- 
 			printChar(' ', 4),
 			printFirstLine_Begin(L),
+			printBoard_Middle([L | T] , N).
+
+
+% printBoard_Middle(+Board, +RowNumber)
+%   Aux function to print Board content
+printBoard_Middle([L | []], N) :- printBoard_End(L, N).
+
+printBoard_Middle([L | T], N) :- 
 			number_string(N, S),
 			writef('%3r ', [S]),
-			N1 is N - 1,
-			printLine(L), 
-			printTab_Middle(T , N1).
-
-
-printTab_Middle([L | T], N) :- 
+			printLine(L),
 			printChar(' ', 4),
 			printSeparationLine(L),
+			N1 is N - 1,
+			printBoard_Middle(T, N1).
+
+% printBoard_End(+Board, +RowNumber)
+%   Aux function to print last line formated and coordinates
+printBoard_End(L, N) :- 		
 			number_string(N, S),
 			writef('%3r ', [S]),
-			N1 is N - 1,
 			printLine(L),
-			printTab_Middle(T, N1).
-
-
-printTab_Middle([], _) :- 
-			printTab_End().
-
-
-printTab_End() :- 		
 			printChar(' ', 4), 
-			tab2([L | _]), 
 			printFinalLine(L),
 			printChar(' ', 4),
 			printCoordsLine(L).
 
 
 
+% printLine(+Line)
+%   Print a line decorated
 printLine([C | L]) :- printLine_Begin([C | L]).
 
 printLine_Begin([C | L])  :-  
-				put_code(9475),
+				put_code('┃'),
 				put_char(' '),
 				printCell(C),
 				put_char(' '),
 				printLine_Middle(L).
 
 printLine_Middle([C | L]) :- 
-				put_code(9474),
+				put_code('│'),
 				put_char(' '),
 				printCell(C),
 				put_char(' '),
 				printLine_Middle(L).
 
-printLine_Middle([]):- 		printLine_End().
-printLine_End() :- 		put_code(9475), nl.
+printLine_Middle([]):- printLine_End().
+printLine_End() :- put_code('┃'), nl.
 
 
-printCell(C) :- 		symbol(C,V), put_code(V).
+% printLine(+Character)
+%   Translate cell content to a symbol and prints it
+printCell(C) :- 
+				symbol(C,V), 
+				put_code(V).
 
 
-/*
-Decoration Functions
-*/
-
-printFirstLine(L) :- 		printFirstLine_Begin(L).
+% printFirstLine(+Line)
+%   Prints first decorative line
+printFirstLine(L) :- printFirstLine_Begin(L).
 
 printFirstLine_Begin([_ | L])  :- 
 				printChar('┏', 1),
@@ -129,12 +149,13 @@ printFirstLine_Middle([_ | L]) :-
 				printChar('━', 3),
 				printFirstLine_Middle(L).
 
-printFirstLine_Middle([]) :- 	printFirstLine_End().
+printFirstLine_Middle([]) :- printFirstLine_End().
 
-printFirstLine_End() :- 	printChar('┓', 1), nl.
+printFirstLine_End() :- printChar('┓', 1), nl.
 
 
-
+% printSeparationLine(+Line)
+%   Prints separation decorative line
 printSeparationLine(L) :- printSeparationLine_Begin(L).
 
 printSeparationLine_Begin([_ | L]) :- 
@@ -151,6 +172,9 @@ printSeparationLine_Middle([]) :- printSeparationLine_End().
 printSeparationLine_End() :- printChar('┨', 1), nl.
 
 
+
+% printFinalLine(+Line)
+%   Prints final decorative line
 printFinalLine(L) :- printFinalLine_Begin(L).
 printFinalLine_Begin([_ | L])  :- 
 				printChar('┗', 1),
@@ -167,8 +191,9 @@ printFinalLine_Middle([]) :- printFinalLine_End().
 printFinalLine_End() :- printChar('┛', 1), nl.
 
 
+% printCoordsLine(+Line)
+%   Prints column coordenates line
 printCoordsLine(L) :- printCoordsLine_Aux(L, 97).
-
 printCoordsLine_Aux([_ | L], N) :- 
 				printChar(' ', 2),
 				put_code(N),
@@ -180,10 +205,20 @@ printCoordsLine_Aux([], _) :- nl.
 
 
 
-
+% printChar(+Char, +N)
+%   Print a Char N times
 printChar(_, 0).
 printChar(C, N) :- 
 				put_char(C),
 				N1 is N - 1,
 				printChar(C, N1).
 
+
+
+% symbol(+String, -Symbol)
+%   Translate internal representation to a symbol
+symbol('empty', ' ').
+symbol('rAliv', '◯').
+symbol('rDead', '⨂').
+symbol('bAliv', '⨉').
+symbol('bDead', '●'). 
