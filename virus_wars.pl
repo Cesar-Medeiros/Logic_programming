@@ -1,46 +1,46 @@
 board_begin([
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty']
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty']
     ]).
 
 
-board_play([
-	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bAliv', 'bAliv', 'bDead', 'bDead'],
-	['empty', 'empty', 'empty', 'empty', 'rDead', 'bDead', 'bDead', 'empty', 'empty', 'rDead'],
-	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead'],
-	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead', 'bDead', 'bDead'],
-	['empty', 'empty', 'empty', 'rDead', 'rDead', 'bDead', 'bDead', 'rDead', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'rDead', 'rDead', 'bDead', 'bDead', 'rDead', 'empty', 'rDead'],
-	['empty', 'rAliv', 'bDead', 'rDead', 'rDead', 'bDead', 'rDead', 'empty', 'empty', 'empty'],
-	['empty', 'rAliv', 'rDead', 'rDead', 'empty', 'bDead', 'empty', 'empty', 'empty', 'empty'],
-	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty']
-    ]).
+board_play([ 
+	['empty','empty','empty','empty','empty','empty','empty','empty','bDead','bDead'],
+	['bAliv','bAliv','empty','empty','empty','rAliv','rAliv','rAliv','rDead','bDead'],
+	['empty','bAliv','empty','empty','bDead','bDead','bDead','bDead','rAliv','bDead'],
+	['empty','bAliv','empty','bAliv','bDead','bDead','bDead','bDead','bDead','rAliv'],
+	['empty','bAliv','bAliv','bAliv','rDead','bDead','bDead','rAliv','rAliv','rAliv'],
+	['empty','empty','empty','bAliv','empty','empty','bDead','bDead','empty','rAliv'],
+	['empty','empty','empty','empty','bDead','bDead','bDead','empty','empty','rAliv'],
+	['empty','empty','empty','empty','empty','empty','empty','bAliv','empty','bDead'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','bDead','bDead'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'] 
+	]).
 
-board_final([
-	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bAliv', 'bAliv', 'bDead', 'bDead'],
-	['empty', 'empty', 'empty', 'empty', 'rDead', 'bDead', 'bDead', 'empty', 'empty', 'rDead'],
-	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead'],
-	['empty', 'empty', 'empty', 'bDead', 'rDead', 'bDead', 'bDead', 'bDead', 'bDead', 'bDead'],
-	['empty', 'empty', 'empty', 'rDead', 'rDead', 'bDead', 'bDead', 'rDead', 'empty', 'empty'],
-	['empty', 'empty', 'empty', 'rDead', 'rDead', 'bDead', 'bDead', 'rDead', 'empty', 'rDead'],
-	['empty', 'rAliv', 'bDead', 'rDead', 'rDead', 'bDead', 'rDead', 'empty', 'empty', 'empty'],
-	['empty', 'rAliv', 'rDead', 'rDead', 'empty', 'bDead', 'empty', 'empty', 'empty', 'empty'],
-	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty'],
-	['rDead', 'rDead', 'rDead', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty', 'empty']
-    ]).
+board_final([ 
+	['empty','empty','empty','empty','empty','empty','empty','empty','bDead','bDead'],
+	['bAliv','bAliv','empty','empty','empty','bDead','bDead','bDead','rDead','bDead'],
+	['empty','bAliv','empty','empty','bDead','bDead','bDead','bDead','bDead','bDead'],
+	['empty','bAliv','empty','bAliv','bDead','bDead','bDead','bDead','bDead','rAliv'],
+	['empty','bAliv','bAliv','bAliv','rDead','bDead','bDead','rAliv','rAliv','rAliv'],
+	['empty','empty','empty','bAliv','empty','empty','bDead','bDead','bDead','rAliv'],
+	['empty','empty','empty','empty','bDead','bDead','bDead','bDead','bDead','bDead'],
+	['empty','empty','empty','bAliv','rDead','bDead','bDead','rDead','empty','bDead'],
+	['empty','empty','empty','empty','bDead','bDead','bDead','empty','bDead','bDead'],
+	['empty','empty','empty','empty','empty','empty','empty','empty','empty','empty'] 
+	]).
 
 % board(+Board)
 %   Select a Board to start the game with
-board(Board) :- board_begin(Board).
+board(Board) :- board_play(Board).
 
 % main - succeeds when game ends;
 %   board "global variable" must have empty board
