@@ -7,17 +7,17 @@
 %   board "global variable" must have empty board
 main(Rows, Cols) :- 
 			mainMenu,
-			mainMenuInput(X),
-			createBoard(Board, Rows, Cols),
-			game(Board, 0).
+			mainMenuInput(_X),
+			createBoard(Rows, Cols),
+			game(Rows, Cols, 0).
 
 % game(+Board, +Player) - main game cycle.
 %   Responsible for making moves and printing the board
 game(_, _) :- verifyEnd().
-game(Board, Player) :- 
-			display_game(Board, Player),
-			playInput([3, 3], PlayerCoords),
-			makeMove(Board, Player, BoardOut, PlayerOut),
+game(Rows, Cols, Player) :- 
+			display_game(Rows, Cols, Player),
+			playInput([Rows, Cols], _PlayerCoords),
+			makeMove(_Board, Player, BoardOut, PlayerOut),
 			game(BoardOut, PlayerOut).
 
 % makeMove(+Board, +Player, -BoardOut, -PlayerOut)

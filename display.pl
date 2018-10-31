@@ -1,67 +1,49 @@
+:-consult('board.pl').
+
 
 % display_game(+Board)
 %   Responsible for printing the board
-display_game(Board,_Player) :- 
-    length(Board, N), 
-    printBoard_Begin(Board, N).
+display_game(Rows, Cols,_Player) :- 
+        printChar(' ', 4),
+        printFirstLine(Rows, Cols),
+        forall(between(1, Rows, Row), (
+                N is Rows - Row + 1,
+                number_string(N, S),
+                writef('%3r ', [S]),
+                printLine(Row, Rows, Cols),
+                printChar(' ', 4),
+                (Row \= Rows -> printSeparationLine(Rows, Cols), !;
+                printFinalLine(Rows, Cols))
+                )),
+        printChar(' ', 4),
+        printCoordsLine(Rows, Cols).
 
-% printBoard_Begin(+Board, +RowNumber)
-%   Aux function to print first line formated
-printBoard_Begin([L | T], N) :- 
-    printChar(' ', 4),
-    printFirstLine_Begin(L),
-    printBoard_Middle([L | T] , N).
-
-
-% printBoard_Middle(+Board, +RowNumber)
-%   Aux function to print Board content
-printBoard_Middle([L | []], N) :- printBoard_End(L, N).
-
-printBoard_Middle([L | T], N) :- 
-    number_string(N, S),
-    writef('%3r ', [S]),
-    printLine(L),
-    printChar(' ', 4),
-    printSeparationLine(L),
-    N1 is N - 1,
-    printBoard_Middle(T, N1).
-
-% printBoard_End(+Board, +RowNumber)
-%   Aux function to print last line formated and coordinates
-printBoard_End(L, N) :- 		
-    number_string(N, S),
-    writef('%3r ', [S]),
-    printLine(L),
-    printChar(' ', 4), 
-    printFinalLine(L),
-    printChar(' ', 4),
-    printCoordsLine(L).
 
 
 
 % printLine(+Line)
 %   Print a line decorated
-printLine([C | L]) :- printLine_Begin([C | L]).
-
-printLine_Begin([C | L])  :-  
+printLine(Row, _, Cols) :- 
         put_code('┃'),
         put_char(' '),
-        printCell(C),
+        getSymbol(Row, 0, Content),
+        printCell(Content),
         put_char(' '),
-        printLine_Middle(L).
+        N is Cols - 1,
+        forall(between(1, N, Col), 
+                (
+                put_code('│'),
+                put_char(' '),
+                getSymbol(Row, Col, Content),
+                printCell(Content),
+                put_char(' ')
+                )
+              ),        
+        put_code('┃'), nl.
 
-printLine_Middle([C | L]) :- 
-        put_code('│'),
-        put_char(' '),
-        printCell(C),
-        put_char(' '),
-        printLine_Middle(L).
-
-printLine_Middle([]):- printLine_End().
-printLine_End() :- put_code('┃'), nl.
 
 
-% printLine(+Character)
+% printCell(+Character)
 %   Translate cell content to a symbol and prints it
 printCell(C) :- 
         symbol(C,V), 
@@ -70,71 +52,54 @@ printCell(C) :-
 
 % printFirstLine(+Line)
 %   Prints first decorative line
-printFirstLine(L) :- printFirstLine_Begin(L).
-
-printFirstLine_Begin([_ | L])  :- 
+printFirstLine(_, Cols) :- 
         printChar('┏', 1),
         printChar('━', 3),
-        printFirstLine_Middle(L).
-
-printFirstLine_Middle([_ | L]) :- 
-        printChar('┯', 1),
-        printChar('━', 3),
-        printFirstLine_Middle(L).
-
-printFirstLine_Middle([]) :- printFirstLine_End().
-
-printFirstLine_End() :- printChar('┓', 1), nl.
+        N is Cols - 1,
+        forall(between(1, N, _), 
+                (printChar('┯', 1), 
+                 printChar('━', 3)) 
+              ),        
+        printChar('┓', 1), nl.
 
 
 % printSeparationLine(+Line)
 %   Prints separation decorative line
-printSeparationLine(L) :- printSeparationLine_Begin(L).
-
-printSeparationLine_Begin([_ | L]) :- 
+printSeparationLine(_, Cols) :- 
         printChar('┠', 1),
         printChar('─', 3),
-        printSeparationLine_Middle(L).
-
-printSeparationLine_Middle([_ | L]) :-
-        printChar('┼', 1),
-        printChar('─', 3),
-        printSeparationLine_Middle(L).
-
-printSeparationLine_Middle([]) :- printSeparationLine_End().
-printSeparationLine_End() :- printChar('┨', 1), nl.
+        N is Cols - 1,
+        forall(between(1, N, _), 
+                (printChar('┼', 1),
+                 printChar('─', 3))
+                ),            
+        printChar('┨', 1), nl.
 
 
 
 % printFinalLine(+Line)
 %   Prints final decorative line
-printFinalLine(L) :- printFinalLine_Begin(L).
-printFinalLine_Begin([_ | L])  :- 
+printFinalLine(_, Cols) :- 
         printChar('┗', 1),
         printChar('━', 3),
-        printFinalLine_Middle(L).
-
-printFinalLine_Middle([_ | L]) :- 
-        printChar('┷', 1),
-        printChar('━', 3),
-        printFinalLine_Middle(L).
-
-printFinalLine_Middle([]) :- printFinalLine_End().
-
-printFinalLine_End() :- printChar('┛', 1), nl.
+        N is Cols - 1,
+        forall(between(1, N, _), 
+                (printChar('┷', 1),
+                printChar('━', 3))
+                ),            
+        printChar('┛', 1), nl.
 
 
 % printCoordsLine(+Line)
 %   Prints column coordenates line
-printCoordsLine(L) :- printCoordsLine_Aux(L, 97).
-printCoordsLine_Aux([_ | L], N) :- 
-        printChar(' ', 2),
-        put_code(N),
-        printChar(' ', 1),
-        N1 is N + 1,
-        printCoordsLine_Aux(L, N1).
-
-printCoordsLine_Aux([], _) :- nl.
+printCoordsLine(_, Cols) :- 
+        FinalCode is 97 + Cols - 1,
+        forall(between(97, FinalCode, Code),
+                (printChar(' ', 2), 
+                 put_code(Code), 
+                 printChar(' ', 1))
+                ),
+        nl.
 
 
 
