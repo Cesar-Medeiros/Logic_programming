@@ -1,6 +1,6 @@
 % board(+Board)
 %   Select a Board to start the game with
-board(Board) :- board_begin(Board).
+%board(Board) :- board_begin(Board).
 createBoard([], 0, _).
 createBoard([L|T], Rows, Cols) :-
     createLine(L, Cols),
