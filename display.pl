@@ -36,7 +36,7 @@ printLine(Row, _, Cols) :-
 
         forall(between(1, Cols, Col), 
                 (
-                getSymbol(Row, Col, Content),
+                getSymbol([Row, Col], Content),
                 printCell(Content),
                 
                 put_char(' '),
@@ -121,6 +121,10 @@ printChar(C, N) :-
         printChar(C, N1).
 
 
+printPlayer(Player) :- 
+        write('Player '),
+        write(Player),
+        nl.
 
 % symbol(+String, -Symbol)
 %   Translate internal representation to a symbol

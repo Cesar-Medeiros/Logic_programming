@@ -7,6 +7,6 @@ createBoard(Rows, Cols) :-
            assertz(game_board(R, C, 'empty'))).
 
 
-getSymbol(Row, Col, Content) :- game_board(Row, Col, Content).
+getSymbol([Row, Col], Content) :- game_board(Row, Col, Content).
 
-setSymbol(Row, Col, Content) :-  retract(game_board(Row, Col, _)), assertz(game_board(Row, Col, Content)).
+setSymbol([Row, Col], Content) :-  retract(game_board(Row, Col, _)), assertz(game_board(Row, Col, Content)).
