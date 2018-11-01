@@ -4,17 +4,24 @@
 % display_game(+Board)
 %   Responsible for printing the board
 display_game(Rows, Cols,_Player) :- 
+
         printChar(' ', 4),
         printFirstLine(Rows, Cols),
-        forall(between(1, Rows, Row), (
-                N is Rows - Row + 1,
-                number_string(N, S),
+
+        forall(between(1, Rows, N), (
+
+                Row is Rows - N + 1,
+
+                number_string(Row, S),
                 writef('%3r ', [S]),
+
                 printLine(Row, Rows, Cols),
                 printChar(' ', 4),
-                (Row \= Rows -> printSeparationLine(Rows, Cols), !;
-                printFinalLine(Rows, Cols))
-                )),
+
+                (Row \= 1 
+                        -> printSeparationLine(Rows, Cols), !
+                        ; printFinalLine(Rows, Cols))
+        )),
         printChar(' ', 4),
         printCoordsLine(Rows, Cols).
 
@@ -26,20 +33,22 @@ display_game(Rows, Cols,_Player) :-
 printLine(Row, _, Cols) :- 
         put_code('┃'),
         put_char(' '),
-        getSymbol(Row, 0, Content),
-        printCell(Content),
-        put_char(' '),
-        N is Cols - 1,
-        forall(between(1, N, Col), 
+
+        forall(between(1, Cols, Col), 
                 (
-                put_code('│'),
-                put_char(' '),
                 getSymbol(Row, Col, Content),
                 printCell(Content),
-                put_char(' ')
+                
+                put_char(' '),
+                (Col == Cols -> 
+                        put_code('┃'), ! 
+                        ; 
+                        (put_code('│'),
+                        put_char(' ')))
+              
                 )
               ),        
-        put_code('┃'), nl.
+        nl.
 
 
 

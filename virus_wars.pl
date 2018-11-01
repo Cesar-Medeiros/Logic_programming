@@ -16,14 +16,15 @@ main(Rows, Cols) :-
 game(_, _) :- verifyEnd().
 game(Rows, Cols, Player) :- 
 			display_game(Rows, Cols, Player),
-			playInput([Rows, Cols], _PlayerCoords),
-			makeMove(_Board, Player, BoardOut, PlayerOut),
-			game(BoardOut, PlayerOut).
+			playInput([Rows, Cols], PlayCoords),
+			makeMove(Player, PlayCoords, PlayerOut),
+			game(Rows, Cols, PlayerOut).
 
 % makeMove(+Board, +Player, -BoardOut, -PlayerOut)
 %   Responsible for making a move and return the next board and player
-makeMove(Board, Player, BoardOut, PlayerOut) :- 
-				BoardOut = Board, 
+makeMove(Player, [Row, Col], PlayerOut) :- 
+				playerSymbol(Player, Symbol),
+				setSymbol(Row, Col, Symbol),
 				PlayerOut is (Player + 1) mod 2.
 
 % verifyEnd() - end game
@@ -31,3 +32,6 @@ makeMove(Board, Player, BoardOut, PlayerOut) :-
 verifyEnd() :- 
 			write('Press \'e\' to exit: '),
 			read(X), X == 'e'.
+
+playerSymbol(0, 'bAliv').
+playerSymbol(1, 'rAliv').  

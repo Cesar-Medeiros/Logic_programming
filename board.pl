@@ -1,8 +1,8 @@
 % board(+Board)
 %   Select a Board to start the game with
 createBoard(Rows, Cols) :-
-    forall(( between(0, Rows, R),
-             between(0, Cols, C)
+    forall(( between(1, Rows, R),
+             between(1, Cols, C)
            ),
            assertz(game_board(R, C, 'empty'))).
 
