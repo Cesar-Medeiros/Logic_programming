@@ -1,5 +1,6 @@
 :-consult('board.pl').
 
+cls:-write('\e[H\e[2J').
 
 % display_game(+Board)
 %   Responsible for printing the board
@@ -121,10 +122,13 @@ printChar(C, N) :-
         printChar(C, N1).
 
 
-printPlayer(Player) :- 
-        write('Player '),
-        write(Player),
-        nl.
+printPlayer(Player) :-
+        getPlayerSymbol(Player, Symbol),
+        format('~n--------------- Player ~w ---------------~n', [Symbol]).
+
+
+getPlayerSymbol(Player, Symbol) :- playerValue(Player, Value), symbol(Value, Symbol).
+
 
 % symbol(+String, -Symbol)
 %   Translate internal representation to a symbol

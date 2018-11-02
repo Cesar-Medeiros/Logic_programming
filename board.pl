@@ -9,6 +9,9 @@ createBoard([Rows, Cols]) :-
     setSymbol([Rows, 1], 'bAliv'),
     setSymbol([1, Cols], 'rAliv').
 
+clearBoard :- retractall(game_board(_,_,_)).
+
+
 
 getSymbol([Row, Col], Content) :- game_board(Row, Col, Content).
 
