@@ -5,49 +5,51 @@
 :- consult('ai.pl').
 
 
-
-
 main(Rows, Cols) :- 
 			mainMenu,
 			mainMenuInput(GameType),
 			getPlayersType(GameType, PlayersType),
 			Dim = [Rows, Cols],
-			createBoard(Dim),
-			game(0, PlayersType, Dim),
-			clearBoard.
+			createBoard(Board, Dim),
+			game(0, PlayersType, Board, Dim).
 
 
 getPlayersType(1, ['user', 'user']).
 getPlayersType(2, ['user', 'computer']).
 getPlayersType(3, ['computer', 'computer']).
-getPlayersType(GameType, PlayersType) :- write('Option not working for now'), fail.
 
 
-game(Player, _, Dim) :- gameOver(Player, Dim).
+game(Player, _, Board, Dim) :- gameOver(Player, Board, Dim).
 
-game(Player, PlayersType, Dim) :- 
+game(Player, PlayersType, Board, Dim) :- 
 			cls,
 			printPlayer(Player),
-			display_game(Dim),
+			display_game(Board, Dim),
 			
 			nth0(Player, PlayersType, PlayerType),
 
-			(getMove(Player, PlayerType, Dim, PlayerMove)
-				-> (/*write('\nValid Move\n'), write(PlayerMove),nl, */makeMove(Player, PlayerMove, PlayerOut))
-				 ; write('\nInvalid Move\n'), PlayerOut is Player),
+			move(Player, PlayerType, Board, Dim, BoardOut, PlayerOut),
+			
 
-			game(PlayerOut, PlayersType, Dim).
+			game(PlayerOut, PlayersType, BoardOut, Dim).
 
-getMove(Player, 'user', Dim, PlayerMove):-
+
+
+move(Player, 'user', Board, Dim, BoardOut, PlayerOut):-
 		playInput(Dim, PlayerMove), !,
-		checkMove(Player, PlayerMove, Dim).
+		(checkMove(Player, PlayerMove, Board, Dim)
+			-> (/*write('\nValid Move\n'), write(PlayerMove),nl, */makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut))
+			 ; write('\nInvalid Move\n'), BoardOut = Board, PlayerOut is Player).
 
-getMove(Player, 'computer', Dim, PlayerMove) :-
-		pickRandomMove(Player, PlayerMove, Dim).
+move(Player, 'computer', Board, Dim, BoardOut, PlayerOut):-
+		% pickRandomMove(Player, PlayerMove, Board, Dim).
+		minimax(Board, Player, BoardOut, _, 2),
+		nextPlayer(Player, PlayerOut).
+		 
 
 
-gameOver(Player, Dim) :-
-		allMoves(Player, Dim, _List, Len),
+gameOver(Player, Board, Dim) :-
+		allMoves(Player, Board, Dim, _List, Len),
 		% write('Possible moves: '),
 		% write(List),
 		% nl,
@@ -60,22 +62,22 @@ gameOver(Player, Dim) :-
 
 % makeMove(+Board, +Player, -BoardOut, -PlayerOut)
 %   Responsible for making a move and return the next board and player
-makeMove(Player, PlayCoords, PlayerOut) :- 
-				(getSymbol(PlayCoords, 'empty')
+makeMove(Board, Player, PlayCoords, BoardOut, PlayerOut) :- 
+				(getSymbol(Board, PlayCoords, 'empty')
 					-> playerValue(Player, Symbol)
 					 ; playerValueZ(Player, Symbol)),
 
-				setSymbol(PlayCoords, Symbol),
+				setSymbol(Board, PlayCoords, Symbol, BoardOut),
 				nextPlayer(Player, PlayerOut).
 
-checkMove(Player, PlayCoords, Dim) :-
-	getSymbol(PlayCoords, Content),
+checkMove(Player, PlayCoords, Board, Dim) :-
+	getSymbol(Board, PlayCoords, Content),
 	(Content = 'empty' ; nextPlayer(Player, PlayerOut), playerValue(PlayerOut, Content)),
 	retractall(visited(_)),
-	checkMoveChain(Player, PlayCoords, Dim).
+	checkMoveChain(Player, PlayCoords, Board, Dim).
 
 
-checkMoveChain(Player, [Row, Col], [Rows, Cols]) :- 
+checkMoveChain(Player, [Row, Col], Board, [Rows, Cols]) :- 
 	not(visited([Row, Col])),
 	assertz(visited([Row, Col])),
 
@@ -84,14 +86,14 @@ checkMoveChain(Player, [Row, Col], [Rows, Cols]) :-
 	playerValueZ(Player, SymbolZ),
 
 	(
-			(NRow is Row + 1, NCol is Col + 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row + 0, NCol is Col + 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row - 1, NCol is Col + 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row + 1, NCol is Col + 0, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row - 1, NCol is Col + 0, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row + 1, NCol is Col - 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row + 0, NCol is Col - 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
-			(NRow is Row - 1, NCol is Col - 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))))
+			(NRow is Row + 1, NCol is Col + 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row + 0, NCol is Col + 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row - 1, NCol is Col + 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row + 1, NCol is Col + 0, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row - 1, NCol is Col + 0, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row + 1, NCol is Col - 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row + 0, NCol is Col - 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
+			(NRow is Row - 1, NCol is Col - 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))))
 	).
 
 playerValue(0, 'bAliv').

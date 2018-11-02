@@ -1,18 +1,14 @@
 % board(+Board)
 %   Select a Board to start the game with
-createBoard([Rows, Cols]) :-
-    forall(( between(1, Rows, R),
-             between(1, Cols, C)
-           ),
-           assertz(game_board(R, C, 'empty'))),
+createBoard(Board, [Rows, Cols]) :-
+            findall(cell(R, C, 'empty'), (between(1, Rows, R), between(1, Cols, C)),  Board1),
+            setSymbol(Board1, [Rows, 1], 'bAliv',Board2),
+            setSymbol(Board2, [1, Cols], 'rAliv', Board3),
+            Board = Board3.
 
-    setSymbol([Rows, 1], 'bAliv'),
-    setSymbol([1, Cols], 'rAliv').
+getSymbol(Board, [Row, Col], Value) :- 
+            member(cell(Row, Col, Value), Board).
 
-clearBoard :- retractall(game_board(_,_,_)).
-
-
-
-getSymbol([Row, Col], Content) :- game_board(Row, Col, Content).
-
-setSymbol([Row, Col], Content) :-  retract(game_board(Row, Col, _)), assertz(game_board(Row, Col, Content)).
+setSymbol(Board, [Row, Col], Value, BoardOut) :- 
+            select(cell(Row,Col,_), Board, BoardRem), 
+            append(BoardRem, [cell(Row, Col, Value)], BoardOut).

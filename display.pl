@@ -1,13 +1,13 @@
 :-consult('board.pl').
 
-cls:-write('\e[H\e[2J').
-
 % display_game(+Board)
 %   Responsible for printing the board
-display_game([Rows, Cols]) :- 
+display_game(Board, [Rows, Cols]) :- 
+        write(Board),
+        write('\n'),
 
         printChar(' ', 4),
-        printFirstLine(Rows, Cols),
+        printFirstLine([Rows, Cols]),
 
         forall(between(1, Rows, N), (
 
@@ -16,28 +16,26 @@ display_game([Rows, Cols]) :-
                 number_string(Row, S),
                 writef('%3r ', [S]),
 
-                printLine(Row, Rows, Cols),
+                printLine(Board, Row, [Rows, Cols]),
                 printChar(' ', 4),
 
                 (Row \= 1 
-                        -> printSeparationLine(Rows, Cols), !
-                        ; printFinalLine(Rows, Cols))
+                        -> printSeparationLine([Rows, Cols]), !
+                        ; printFinalLine([Rows, Cols]))
         )),
         printChar(' ', 4),
-        printCoordsLine(Rows, Cols).
-
-
+        printCoordsLine([Rows, Cols]).
 
 
 % printLine(+Line)
 %   Print a line decorated
-printLine(Row, _, Cols) :- 
+printLine(Board, Row, [_, Cols]) :- 
         put_code('┃'),
         put_char(' '),
 
         forall(between(1, Cols, Col), 
                 (
-                getSymbol([Row, Col], Content),
+                getSymbol(Board, [Row, Col], Content),
                 printCell(Content),
                 
                 put_char(' '),
@@ -62,7 +60,7 @@ printCell(C) :-
 
 % printFirstLine(+Line)
 %   Prints first decorative line
-printFirstLine(_, Cols) :- 
+printFirstLine([_, Cols]) :- 
         printChar('┏', 1),
         printChar('━', 3),
         N is Cols - 1,
@@ -75,7 +73,7 @@ printFirstLine(_, Cols) :-
 
 % printSeparationLine(+Line)
 %   Prints separation decorative line
-printSeparationLine(_, Cols) :- 
+printSeparationLine([_, Cols]) :- 
         printChar('┠', 1),
         printChar('─', 3),
         N is Cols - 1,
@@ -89,7 +87,7 @@ printSeparationLine(_, Cols) :-
 
 % printFinalLine(+Line)
 %   Prints final decorative line
-printFinalLine(_, Cols) :- 
+printFinalLine([_, Cols]) :- 
         printChar('┗', 1),
         printChar('━', 3),
         N is Cols - 1,
@@ -102,7 +100,7 @@ printFinalLine(_, Cols) :-
 
 % printCoordsLine(+Line)
 %   Prints column coordenates line
-printCoordsLine(_, Cols) :- 
+printCoordsLine([_, Cols]) :- 
         FinalCode is 97 + Cols - 1,
         forall(between(97, FinalCode, Code),
                 (printChar(' ', 2), 
@@ -121,13 +119,6 @@ printChar(C, N) :-
         N1 is N - 1,
         printChar(C, N1).
 
-
-printPlayer(Player) :-
-        getPlayerSymbol(Player, Symbol),
-        format('~n--------------- Player ~w ---------------~n', [Symbol]).
-
-
-getPlayerSymbol(Player, Symbol) :- playerValue(Player, Value), symbol(Value, Symbol).
 
 
 % symbol(+String, -Symbol)

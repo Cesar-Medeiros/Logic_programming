@@ -9,3 +9,13 @@ mainMenu :-
     write('┃                               ┃\n'),
     write('┃  (0) - Exit                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
+
+
+printPlayer(Player) :-
+    getPlayerSymbol(Player, Symbol),
+    format('~n--------------- Player ~w ---------------~n', [Symbol]).
+
+
+getPlayerSymbol(Player, Symbol) :- playerValue(Player, Value), symbol(Value, Symbol).
+
+cls:-write('\e[H\e[2J').
