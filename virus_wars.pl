@@ -2,30 +2,50 @@
 :- consult('board.pl').
 :- consult('input.pl').
 :- consult('menu.pl').
+:- consult('ai.pl').
 
-% main - succeeds when game ends;
-%   board "global variable" must have empty board
+
+
+
 main(Rows, Cols) :- 
-			mainMenu,
-			mainMenuInput(_X),
-			createBoard(Rows, Cols),
-			setSymbol([Rows, 1], 'bAliv'),
-			setSymbol([1, Cols], 'rAliv'),
-			game(Rows, Cols, 0).
+			% mainMenu,
+			% mainMenuInput(_X),
+			Dim = [Rows, Cols],
+			createBoard(Dim),
+			game(0, Dim).
 
-% game(+Board, +Player) - main game cycle.
-%   Responsible for making moves and printing the board
-game(_, _) :- verifyEnd().
-game(Rows, Cols, Player) :- 
-			display_game(Rows, Cols, Player),
+
+
+game(Player, Dim) :- gameOver(Player, Dim).
+
+game(Player, Dim) :- 
+			display_game(Dim),
 			printPlayer(Player),
-			playInput([Rows, Cols], PlayCoords),
-			(checkMove(Player, PlayCoords, [Rows, Cols])
-				-> (write('\nOK\n'), makeMove(Player, PlayCoords, PlayerOut))
-				; write('\nFail\n')
-				),
-				retractall(visited(X)),
-			game(Rows, Cols, PlayerOut).
+			
+			
+			(play(Player, PlayerMove, Dim)
+				-> (write('\nValid Move\n'), write(PlayerMove),nl, makeMove(Player, PlayerMove, PlayerOut))
+				 ; write('\nInvalid Move\n'), PlayerOut is Player),
+
+			game(PlayerOut, Dim).
+
+play(Player, PlayerMove, Dim):-
+		Player = 0,
+		playInput(Dim, PlayerMove), !,
+		checkMove(Player, PlayerMove, Dim).
+
+play(Player, PlayerMove, Dim) :- 
+		Player = 1,
+		pickRandomMove(Player, PlayerMove, Dim).
+
+
+gameOver(Player, Dim) :-
+		allMoves(Player, Dim, List, Len),
+		write('Possible moves: '),
+		write(List),
+		nl,
+		!,
+		Len = 0.
 
 % makeMove(+Board, +Player, -BoardOut, -PlayerOut)
 %   Responsible for making a move and return the next board and player
@@ -38,16 +58,14 @@ makeMove(Player, PlayCoords, PlayerOut) :-
 				% PlayerOut is Player.
 				nextPlayer(Player, PlayerOut).
 
-checkMove(Player, PlayCoords, Dim) :- 
+checkMove(Player, PlayCoords, Dim) :-
 	getSymbol(PlayCoords, Content),
-	(Content = 'empty' ; nextPlayer(Player, PlayerOut), playerSymbol(PlayerOut, Content)),!,
+	(Content = 'empty' ; nextPlayer(Player, PlayerOut), playerSymbol(PlayerOut, Content)),
+	retractall(visited(X)),
 	checkMoveChain(Player, PlayCoords, Dim).
 
 
-visited([-1, -1]).
-
 checkMoveChain(Player, [Row, Col], [Rows, Cols]) :- 
-
 	not(visited([Row, Col])),
 	assertz(visited([Row, Col])),
 
@@ -65,11 +83,6 @@ checkMoveChain(Player, [Row, Col], [Rows, Cols]) :-
 			(NRow is Row + 0, NCol is Col - 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))));
 			(NRow is Row - 1, NCol is Col - 1, (getSymbol([NRow, NCol], Symbol) ; (getSymbol([NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], [Rows, Cols]))))
 	).
-% verifyEnd() - end game
-%  Exit game on user input 'e'
-verifyEnd() :- 
-			write('Press \'e\' to exit: '),
-			read(X), X == 'e'.
 
 playerSymbol(0, 'bAliv').
 playerSymbol(1, 'rAliv').

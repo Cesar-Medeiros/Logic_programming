@@ -1,10 +1,13 @@
 % board(+Board)
 %   Select a Board to start the game with
-createBoard(Rows, Cols) :-
+createBoard([Rows, Cols]) :-
     forall(( between(1, Rows, R),
              between(1, Cols, C)
            ),
-           assertz(game_board(R, C, 'empty'))).
+           assertz(game_board(R, C, 'empty'))),
+
+    setSymbol([Rows, 1], 'bAliv'),
+    setSymbol([1, Cols], 'rAliv').
 
 
 getSymbol([Row, Col], Content) :- game_board(Row, Col, Content).

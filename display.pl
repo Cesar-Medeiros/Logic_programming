@@ -3,7 +3,7 @@
 
 % display_game(+Board)
 %   Responsible for printing the board
-display_game(Rows, Cols,_Player) :- 
+display_game([Rows, Cols]) :- 
 
         printChar(' ', 4),
         printFirstLine(Rows, Cols),
