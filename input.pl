@@ -6,7 +6,7 @@ checkMenuInput(N) :-
     N=<3.
 
 
-playInput([NRows, NCols], [Row, Col]) :-
+playInput(_-[NRows, NCols], [Row, Col]) :-
     input('Row', [Row, NRows], checkRows, 'Invalid Row'),
     input('Col', [CCol, NCols], checkCols, 'Invalid Col'),
     char_code('a', CodeA),

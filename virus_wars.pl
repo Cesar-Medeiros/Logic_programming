@@ -3,6 +3,7 @@
 :- consult('input.pl').
 :- consult('menu.pl').
 :- consult('ai.pl').
+:- dynamic('visited/1').
 
 
 main(Rows, Cols) :- 
@@ -10,8 +11,9 @@ main(Rows, Cols) :-
 			mainMenuInput(GameType),
 			getPlayersType(GameType, PlayersType),
 			Dim = [Rows, Cols],
-			createBoard(Board, Dim),
-			game(0, PlayersType, Board, Dim).
+			createBoard(BoardCells, Dim),
+			Board = BoardCells-Dim,
+			game(0, PlayersType, Board).
 
 
 getPlayersType(1, ['user', 'user']).
@@ -19,42 +21,34 @@ getPlayersType(2, ['user', 'computer']).
 getPlayersType(3, ['computer', 'computer']).
 
 
-game(Player, _, Board, Dim) :- gameOver(Player, Board, Dim).
+game(Player, _, Board) :- gameOver(Player, Board).
 
-game(Player, PlayersType, Board, Dim) :- 
+game(Player, PlayersType, Board) :- 
 			cls,
 			printPlayer(Player),
-			display_game(Board, Dim),
-			
+			display_game(Board),
 			nth0(Player, PlayersType, PlayerType),
-
-			move(Player, PlayerType, Board, Dim, BoardOut, PlayerOut),
-			
-
-			game(PlayerOut, PlayersType, BoardOut, Dim).
+			move(Player, PlayerType, Board, BoardOut, PlayerOut),
+			game(PlayerOut, PlayersType, BoardOut).
 
 
 
-move(Player, 'user', Board, Dim, BoardOut, PlayerOut):-
-		playInput(Dim, PlayerMove), !,
-		(checkMove(Player, PlayerMove, Board, Dim)
+move(Player, 'user', Board, BoardOut, PlayerOut):-
+		playInput(Board, PlayerMove), !,
+		(checkMove(Player, PlayerMove, Board)
 			-> (/*write('\nValid Move\n'), write(PlayerMove),nl, */makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut))
 			 ; write('\nInvalid Move\n'), BoardOut = Board, PlayerOut is Player).
 
-move(Player, 'computer', Board, Dim, BoardOut, PlayerOut):-
-		% pickRandomMove(Player, PlayerMove, Board, Dim).
-		minimax(Board, Player, BoardOut, _, 2),
+move(Player, 'computer', Board, BoardOut, PlayerOut):-
+		% pickRandomMove(Player, PlayerMove, Board, Dim),
+		% makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut),
+		minimax(Board, Player, BoardOut, _Val, 6),
 		nextPlayer(Player, PlayerOut).
 		 
 
 
-gameOver(Player, Board, Dim) :-
-		allMoves(Player, Board, Dim, _List, Len),
-		% write('Possible moves: '),
-		% write(List),
-		% nl,
-		!,
-		Len = 0,
+gameOver(Player, Board) :-
+		not(generateValidMoves(Player, _, Board)),
 		nextPlayer(Player, PreviousPlayer),
 		getPlayerSymbol(PreviousPlayer, Symbol),
 		format('Player ~w won.~n', [Symbol]).
@@ -66,39 +60,60 @@ makeMove(Board, Player, PlayCoords, BoardOut, PlayerOut) :-
 				(getSymbol(Board, PlayCoords, 'empty')
 					-> playerValue(Player, Symbol)
 					 ; playerValueZ(Player, Symbol)),
-
 				setSymbol(Board, PlayCoords, Symbol, BoardOut),
 				nextPlayer(Player, PlayerOut).
 
-checkMove(Player, PlayCoords, Board, Dim) :-
-	getSymbol(Board, PlayCoords, Content),
-	(Content = 'empty' ; nextPlayer(Player, PlayerOut), playerValue(PlayerOut, Content)),
+checkMove(Player, PlayCoords, Board) :-
+	isPositionValid(Board, PlayCoords),
+	(getSymbol(Board, PlayCoords, 'empty') ; (nextPlayer(Player, PlayerOut), playerValue(PlayerOut, Content), getSymbol(Board, PlayCoords, Content))),
 	retractall(visited(_)),
-	checkMoveChain(Player, PlayCoords, Board, Dim).
+	checkMoveChain(Player, PlayCoords, Board).
+	% (checkMoveChain(Player, PlayCoords, Board, Dim), !, write('OK'), write(PlayCoords); (write('Fail'), write(PlayCoords), fail)).
 
-
-checkMoveChain(Player, [Row, Col], Board, [Rows, Cols]) :- 
+checkMoveChain(Player, [Row, Col], Board) :- 
 	not(visited([Row, Col])),
-	assertz(visited([Row, Col])),
+	asserta(visited([Row, Col])),
 
-	Row >= 1, Row =< Rows, Col >=1, Col =< Cols,
 	playerValue(Player, Symbol),
 	playerValueZ(Player, SymbolZ),
 
-	(
-			(NRow is Row + 1, NCol is Col + 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row + 0, NCol is Col + 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row - 1, NCol is Col + 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row + 1, NCol is Col + 0, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row - 1, NCol is Col + 0, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row + 1, NCol is Col - 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row + 0, NCol is Col - 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))));
-			(NRow is Row - 1, NCol is Col - 1, (getSymbol(Board, [NRow, NCol], Symbol) ; (getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board, [Rows, Cols]))))
-	).
+	%Perhaps the use of BFS insted of DFS is more efficient
+	between(-1, 1, ROffset), between(-1, 1, COffset),
+	not((ROffset = 0, COffset = 0)),
+	NRow is Row + ROffset, 
+	NCol is Col + COffset, 
+	isPositionValid(Board, [NRow, NCol]),
+	(getSymbol(Board, [NRow, NCol], Symbol) 
+	; 
+	(getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board))).
+
+
+
+generateValidMoves(Player, List, Board) :-
+	playerValue(Player, Value),
+	nextPlayer(Player, Player2),
+	playerValue(Player2, Value2),
+	setof([NRow, NCol],
+		(ROffset, COffset)^(getSymbol(Board,[Row, Col], Value),
+		between(-1, 1, ROffset), between(-1, 1, COffset),
+		not((ROffset = 0, COffset = 0)),
+		NRow is Row + ROffset, 
+		NCol is Col + COffset,
+		isPositionValid(Board, [NRow, NCol]),
+		(getSymbol(Board, [NRow, NCol], 'empty');
+		getSymbol(Board, [NRow, NCol], Value2))),
+		List),
+	length(List, Len),
+	!,
+	Len \= 0.
+		
+
+	
 
 playerValue(0, 'bAliv').
 playerValue(1, 'rAliv').
 playerValueZ(0, 'bDead').
 playerValueZ(1, 'rDead').
 
+            
 nextPlayer(PlayerIn, PlayerOut) :- PlayerOut is (PlayerIn + 1) mod 2.
