@@ -6,20 +6,11 @@
 :- dynamic('visited/1').
 
 
-main(Rows, Cols) :- 
-			mainMenu,
-			mainMenuInput(GameType),
-			getPlayersType(GameType, PlayersType),
-			Dim = [Rows, Cols],
+main() :- 
+			getGameInfo(PlayersType, AILevel, Dim),
 			createBoard(BoardCells, Dim),
 			Board = BoardCells-Dim,
 			game(0, PlayersType, Board).
-
-
-getPlayersType(1, ['user', 'user']).
-getPlayersType(2, ['user', 'computer']).
-getPlayersType(3, ['computer', 'computer']).
-
 
 game(Player, _, Board) :- gameOver(Player, Board).
 
@@ -36,7 +27,8 @@ game(Player, PlayersType, Board) :-
 move(Player, 'user', Board, BoardOut, PlayerOut):-
 		playInput(Board, PlayerMove), !,
 		(checkMove(Player, PlayerMove, Board)
-			-> (/*write('\nValid Move\n'), write(PlayerMove),nl, */makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut))
+			-> (/*write('\nValid Move\n'), write(PlayerMove),nl, */
+			makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut))
 			 ; write('\nInvalid Move\n'), BoardOut = Board, PlayerOut is Player).
 
 move(Player, 'computer', Board, BoardOut, PlayerOut):-

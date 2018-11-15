@@ -1,9 +1,47 @@
+getGameInfo(PlayersType, AIType, Dim) :-
+    getPlayersType(PlayersType),
+    getAIType(AIType),
+    getDim(Dim).
+
+getPlayersType(PlayersType) :-
+    mainMenu,
+	mainMenuInput(GameType),
+	playersType(GameType, PlayersType).
+    
 mainMenuInput(N) :-
+    input('Option', [N], checkMenuInput, 'Invalid Input').
+
+
+getAIType(AIType) :-
+    aiMenu,
+	aiMenuInput(Level),
+	aiType(Level, AIType).
+    
+aiMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').
 
 checkMenuInput(N) :-
     N>=0,
     N=<3.
+
+getDim(Dim) :-
+    dimMenu,
+    dimInput(NRows, NCols),
+    Dim = [NRows, NCols].
+
+dimInput(NRows, NCols) :-
+    input('Number of Rows', [NRows], checkDim, 'Invalid number of rows'),
+    input('Number of Collumns', [NCols], checkDim, 'Invalid number of columns').
+
+checkDim(N) :- N > 0.
+
+playersType(1, ['user', 'user']).
+playersType(2, ['user', 'computer']).
+playersType(3, ['computer', 'computer']).
+
+aiType(1, 'random').
+aiType(2, 'minimax').
+aiType(3, 'minimax').
 
 
 playInput(_-[NRows, NCols], [Row, Col]) :-
@@ -29,7 +67,7 @@ checkCols([Col, NCols]) :-
 
 input(Prompt, [Value|Rest], CheckPred, ErrorMsg) :-
     repeat,
-    format('~w: ', [Prompt]),
+    format('~w: \n', [Prompt]),
     read(Value),
 
     (   call(CheckPred, [Value|Rest])
