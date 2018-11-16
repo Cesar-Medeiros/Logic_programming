@@ -4,10 +4,12 @@
 :- consult('menu.pl').
 :- consult('ai.pl').
 :- dynamic('visited/1').
+:- dynamic('aiType/1').
 
 
 main() :- 
-			getGameInfo(PlayersType, AILevel, Dim),
+			getGameInfo(PlayersType, AI, Dim),
+			asserta(aiType(AI)),
 			createBoard(BoardCells, Dim),
 			Board = BoardCells-Dim,
 			game(0, PlayersType, Board).
@@ -31,13 +33,17 @@ move(Player, 'user', Board, BoardOut, PlayerOut):-
 			makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut))
 			 ; write('\nInvalid Move\n'), BoardOut = Board, PlayerOut is Player).
 
-move(Player, 'computer', Board, BoardOut, PlayerOut):-
-		% pickRandomMove(Player, PlayerMove, Board, Dim),
-		% makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut),
+move(Player, 'computer', Board, BoardOut, PlayerOut):- 
+		aiType('minimax'),
 		minimax(Board, Player, BoardOut, _Val, 6),
 		nextPlayer(Player, PlayerOut).
-		 
 
+
+move(Player, 'computer', Board, BoardOut, PlayerOut):- 
+		aiType('random'),
+		pickRandomMove(Player, PlayerMove, Board),
+		makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut),
+		nextPlayer(Player, PlayerOut).
 
 gameOver(Player, Board) :-
 		not(generateValidMoves(Player, _, Board)),

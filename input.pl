@@ -1,6 +1,6 @@
 getGameInfo(PlayersType, AIType, Dim) :-
     getPlayersType(PlayersType),
-    getAIType(AIType),
+    getAIType(AIType, PlayersType),
     getDim(Dim).
 
 getPlayersType(PlayersType) :-
@@ -11,11 +11,13 @@ getPlayersType(PlayersType) :-
 mainMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').
 
-
-getAIType(AIType) :-
+getAIType(AIType, PlayersType) :-
+    PlayersType \== ['user', 'user'], !, 
     aiMenu,
 	aiMenuInput(Level),
 	aiType(Level, AIType).
+
+getAIType(0, _).
     
 aiMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').

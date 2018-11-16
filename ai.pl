@@ -68,8 +68,8 @@ pickRandomMove(Player, PlayerMove, Board, Dim) :-
     random(0, Len, Random),
     nth0(Random, List, PlayerMove). 
 
-allMoves(Player, Board, Dim, List, Len):-
-        generateValidMoves(Player, List, Board, Dim),
+allMoves(Player, Board, List, Len):-
+        generateValidMoves(Player, List, Board),
         length(List, Len).
 
 allMoves(_, _, _, [], 0).
