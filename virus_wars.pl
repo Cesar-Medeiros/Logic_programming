@@ -8,7 +8,7 @@
 :- dynamic('playerType/2').
 
 
-play :- 
+main :- 
 			getGameInfo(PlayersType, FirstPlayer, AI, Dim),
 			storeGameInfo(PlayersType, AI),
 			createBoard(BoardCells, Dim),
