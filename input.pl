@@ -2,10 +2,10 @@
 % Game Info
 % ==========
 
-getGameInfo(PlayersType, FirstPlayer, AIType, Dim) :-
+getGameInfo(PlayersType, FirstPlayer, AILevel, Dim) :-
     getPlayersType(PlayersType),
     getFirstPlayer(FirstPlayer),
-    getAIType(AIType, PlayersType),
+    getAILevel(AILevel, PlayersType),
     getDim(Dim).
 
 
@@ -44,14 +44,13 @@ checkPlayerInput(Player) :-
     Player=<2.
 
 % ========
-% AI Type
+% AI Level
 % ========
 
-getAIType(0, ['user', 'user']).
-getAIType(AIType, _PlayersType) :-
+getAILevel(0, ['user', 'user']).
+getAILevel(AILevel, _PlayersType) :-
     aiMenu,
-	aiMenuInput(Level),
-	aiType(Level, AIType).
+	aiMenuInput(AILevel).
 
 aiMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').
