@@ -1,7 +1,18 @@
-getGameInfo(PlayersType, AIType, Dim) :-
+% ==========
+% Game Info
+% ==========
+
+getGameInfo(PlayersType, FirstPlayer, AIType, Dim) :-
     getPlayersType(PlayersType),
+    getFirstPlayer(FirstPlayer),
     getAIType(AIType, PlayersType),
     getDim(Dim).
+
+
+
+% ============
+% Player Type
+% ============
 
 getPlayersType(PlayersType) :-
     mainMenu,
@@ -11,20 +22,53 @@ getPlayersType(PlayersType) :-
 mainMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').
 
-getAIType(AIType, PlayersType) :-
-    PlayersType \== ['user', 'user'], !, 
+playersType(1, ['user', 'user']).
+playersType(2, ['user', 'computer']).
+playersType(3, ['computer', 'computer']).
+
+
+% =============
+% First Player
+% =============
+
+getFirstPlayer(FirstPlayer) :-
+    firstPlayerMenu,
+    firstPlayerMenuInput(FirstPlayer).
+
+firstPlayerMenuInput(FirstPlayer) :-
+    input('Option', [PlayerOption], checkPlayerInput, 'Invalid Input'),
+    FirstPlayer is PlayerOption - 1.
+
+checkPlayerInput(Player) :-
+    Player>=0,
+    Player=<2.
+
+% ========
+% AI Type
+% ========
+
+getAIType(0, ['user', 'user']).
+getAIType(AIType, _PlayersType) :-
     aiMenu,
 	aiMenuInput(Level),
 	aiType(Level, AIType).
 
-getAIType(0, _).
-    
 aiMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').
 
 checkMenuInput(N) :-
     N>=0,
     N=<3.
+
+aiType(1, 'level1').
+aiType(2, 'level2').
+aiType(3, 'level3').
+
+
+
+% ================
+% Board Dimension
+% ================
 
 getDim(Dim) :-
     dimMenu,
@@ -37,14 +81,10 @@ dimInput(NRows, NCols) :-
 
 checkDim(N) :- N > 0.
 
-playersType(1, ['user', 'user']).
-playersType(2, ['user', 'computer']).
-playersType(3, ['computer', 'computer']).
 
-aiType(1, 'random').
-aiType(2, 'minimax').
-aiType(3, 'minimax').
-
+% ===========
+% Move input
+% ===========
 
 playInput(_-[NRows, NCols], [Row, Col]) :-
     input('Row', [Row, NRows], checkRows, 'Invalid Row'),
@@ -58,7 +98,6 @@ checkRows([Row, NRows]) :-
     Row>=1,
     Row=<NRows.
 
-
 checkCols([Col, NCols]) :-
     is_alpha(Col),
     char_code('a', CodeA),
@@ -67,6 +106,9 @@ checkCols([Col, NCols]) :-
     CodeC =< CodeA + NCols.
 
 
+% ===============
+% Input template
+% ===============
 input(Prompt, [Value|Rest], CheckPred, ErrorMsg) :-
     repeat,
     format('~w: \n', [Prompt]),
@@ -77,7 +119,3 @@ input(Prompt, [Value|Rest], CheckPred, ErrorMsg) :-
     ;   format('ERROR: ~w.~n', [ErrorMsg]),
         fail
     ).
-
-    % (Type = 'String' -> read(Value), !;
-    % (Type = 'Char'   -> read(Value), !;
-    % (Type = 'Number' -> read(CValue), atom_number(CValue, Value)))), 

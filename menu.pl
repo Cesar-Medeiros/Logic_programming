@@ -19,20 +19,30 @@ aiMenu :-
     write('┃  (2) - Level 2                ┃\n'),
     write('┃  (3) - Level 3                ┃\n'),
     write('┃                               ┃\n'),
-    write('┃  (0) - Exit                   ┃\n'),
+    write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
 dimMenu :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
     write('┃        Board Dimensions       ┃\n'),
-    write('┠───────────────────────────────┨\n').
+    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n').
+
+firstPlayerMenu :-
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
+    write('┃         First Player          ┃\n'),
+    write('┠───────────────────────────────┨\n'),
+    write('┃                               ┃\n'),
+    write('┃  (1) - Player ◯               ┃\n'),
+    write('┃  (2) - Player ⨉               ┃\n'),
+    write('┃                               ┃\n'),
+    write('┃  (0) - Back                   ┃\n'),
+    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
+
+
 
 
 printPlayer(Player) :-
     getPlayerSymbol(Player, Symbol),
     format('~n--------------- Player ~w ---------------~n', [Symbol]).
-
-
-getPlayerSymbol(Player, Symbol) :- playerValue(Player, Value), symbol(Value, Symbol).
 
 cls:-write('\e[H\e[2J').

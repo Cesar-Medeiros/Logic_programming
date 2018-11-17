@@ -5,24 +5,36 @@
 :- consult('ai.pl').
 :- dynamic('visited/1').
 :- dynamic('aiType/1').
+:- dynamic('playerType/2').
 
 
-main() :- 
-			getGameInfo(PlayersType, AI, Dim),
-			asserta(aiType(AI)),
+main :- 
+			getGameInfo(PlayersType, FirstPlayer, AI, Dim),
+			storeGameInfo(PlayersType, AI),
 			createBoard(BoardCells, Dim),
 			Board = BoardCells-Dim,
-			game(0, PlayersType, Board).
+			game(FirstPlayer, Board).
 
-game(Player, _, Board) :- gameOver(Player, Board).
 
-game(Player, PlayersType, Board) :- 
-			cls,
-			printPlayer(Player),
-			display_game(Board),
-			nth0(Player, PlayersType, PlayerType),
+storeGameInfo([Player1Type, Player2Type], AI) :-
+			asserta(playerType(0, Player1Type)),
+			asserta(playerType(1, Player2Type)),
+			asserta(aiType(AI)).
+
+game(Player, Board) :- 
+			gameOver(Player, Board).
+
+game(Player, Board) :- 
+			display_game(Player, Board),
+			playerType(Player, PlayerType),
 			move(Player, PlayerType, Board, BoardOut, PlayerOut),
-			game(PlayerOut, PlayersType, BoardOut).
+			game(PlayerOut, BoardOut).
+
+gameOver(Player, Board) :-
+	not(generateValidMoves(Player, _, Board)),
+	nextPlayer(Player, PreviousPlayer),
+	getPlayerSymbol(PreviousPlayer, Symbol),
+	format('Player ~w won.~n', [Symbol]).
 
 
 
@@ -34,22 +46,15 @@ move(Player, 'user', Board, BoardOut, PlayerOut):-
 			 ; write('\nInvalid Move\n'), BoardOut = Board, PlayerOut is Player).
 
 move(Player, 'computer', Board, BoardOut, PlayerOut):- 
-		aiType('minimax'),
-		minimax(Board, Player, BoardOut, _Val, 6),
-		nextPlayer(Player, PlayerOut).
-
+	aiType('level1'),
+	pickRandomMove(Player, PlayerMove, Board),
+	makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut),
+	nextPlayer(Player, PlayerOut).
 
 move(Player, 'computer', Board, BoardOut, PlayerOut):- 
-		aiType('random'),
-		pickRandomMove(Player, PlayerMove, Board),
-		makeMove(Board, Player, PlayerMove, BoardOut, PlayerOut),
+		aiType('level3'),
+		minimax(Board, Player, BoardOut, _Val, 6),
 		nextPlayer(Player, PlayerOut).
-
-gameOver(Player, Board) :-
-		not(generateValidMoves(Player, _, Board)),
-		nextPlayer(Player, PreviousPlayer),
-		getPlayerSymbol(PreviousPlayer, Symbol),
-		format('Player ~w won.~n', [Symbol]).
 
 
 % makeMove(+Board, +Player, -BoardOut, -PlayerOut)
@@ -104,14 +109,21 @@ generateValidMoves(Player, List, Board) :-
 	length(List, Len),
 	!,
 	Len \= 0.
+
+
+% generateValidMove(Player, Board, Move) :- 
+
+
+adjacentPosition(Player, Board, [Row, Col], [NRow, NCol]) :-
+	between(-1, 1, ROffset), between(-1, 1, COffset),
+	not((ROffset = 0, COffset = 0)),
+	NRow is Row + ROffset, 
+	NCol is Col + COffset,
+	isPositionValid(Board, [NRow, NCol]),
+	(getSymbol(Board, [NRow, NCol], 'empty');
+	getSymbol(Board, [NRow, NCol], Value2)).
 		
 
-	
-
-playerValue(0, 'bAliv').
-playerValue(1, 'rAliv').
-playerValueZ(0, 'bDead').
-playerValueZ(1, 'rDead').
 
             
 nextPlayer(PlayerIn, PlayerOut) :- PlayerOut is (PlayerIn + 1) mod 2.

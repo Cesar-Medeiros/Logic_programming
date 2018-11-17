@@ -63,8 +63,8 @@ calculate(_, 0, 100).
 calculate(_, 1, -100).
 
 
-pickRandomMove(Player, PlayerMove, Board, Dim) :- 	
-    allMoves(Player, Board, Dim, List, Len),
+pickRandomMove(Player, PlayerMove, Board) :- 	
+    allMoves(Player, Board, List, Len),
     random(0, Len, Random),
     nth0(Random, List, PlayerMove). 
 

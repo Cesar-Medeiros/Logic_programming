@@ -1,8 +1,13 @@
 :-consult('board.pl').
 
+display_game(Player, Board) :- 
+        cls,
+        printPlayer(Player),
+        printBoard(Board).
+
 % display_game(+Board)
 %   Responsible for printing the board
-display_game(Board) :- 
+printBoard(Board) :- 
         _-[Rows, Cols] = Board,
         printChar(' ', 4),
         printFirstLine([Rows, Cols]),
@@ -118,6 +123,16 @@ printChar(C, N) :-
         printChar(C, N1).
 
 
+
+getPlayerSymbol(Player, Symbol) :- 
+        playerValue(Player, Value), 
+        symbol(Value, Symbol).
+    
+    
+playerValue(0, 'bAliv').
+playerValue(1, 'rAliv').
+playerValueZ(0, 'bDead').
+playerValueZ(1, 'rDead').
 
 % symbol(+String, -Symbol)
 %   Translate internal representation to a symbol
