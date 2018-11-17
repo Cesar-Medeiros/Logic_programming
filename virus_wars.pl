@@ -31,7 +31,7 @@ game(Player, Board) :-
 			game(PlayerOut, BoardOut).
 
 gameOver(Player, Board) :-
-	not(generateValidMoves(Player, _, Board)),
+	not(valid_moves(Board, Player, _)),
 	nextPlayer(Player, PreviousPlayer),
 	getPlayerSymbol(PreviousPlayer, Symbol),
 	format('Player ~w won.~n', [Symbol]).
@@ -90,9 +90,10 @@ checkMoveChain(Player, [Row, Col], Board) :-
 	; 
 	(getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board))).
 
+%valid_moves(+Board, +Player, -ListOfMoves).
+% Returns the list of valid moves in ListOfMoves
 
-
-generateValidMoves(Player, List, Board) :-
+valid_moves(Board, Player, ListOfMoves) :-
 	playerValue(Player, Value),
 	nextPlayer(Player, Player2),
 	playerValue(Player2, Value2),
@@ -105,14 +106,10 @@ generateValidMoves(Player, List, Board) :-
 		isPositionValid(Board, [NRow, NCol]),
 		(getSymbol(Board, [NRow, NCol], 'empty');
 		getSymbol(Board, [NRow, NCol], Value2))),
-		List),
-	length(List, Len),
+		ListOfMoves),
+	length(ListOfMoves, Len),
 	!,
 	Len \= 0.
-
-
-% generateValidMove(Player, Board, Move) :- 
-
 
 adjacentPosition(Player, Board, [Row, Col], [NRow, NCol]) :-
 	between(-1, 1, ROffset), between(-1, 1, COffset),

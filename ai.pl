@@ -17,7 +17,7 @@ minimax(Board, Player, BestNextBoard, Val, Lvl) :-                     % Pos has
     % nl,
     % forall(between(1, 1, _), display_game(Board, [3,3])),
     Lvl1 is Lvl - 1,
-    generateValidMoves(Player, List, Board),
+    valid_moves(Board, Player, List),
     findall(NextBoard, (member(PlayCoords, List), makeMove(Board, Player, PlayCoords, NextBoard, _)), NextBoardList),
     % write('Possible moves: '),
     % nl,
@@ -69,7 +69,7 @@ pickRandomMove(Player, PlayerMove, Board) :-
     nth0(Random, List, PlayerMove). 
 
 allMoves(Player, Board, List, Len):-
-        generateValidMoves(Player, List, Board),
+        valid_moves(Board, Player, List),
         length(List, Len).
 
 allMoves(_, _, _, [], 0).
