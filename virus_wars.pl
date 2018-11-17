@@ -138,6 +138,8 @@ checkMoveChain(Player, [Row, Col], Board) :-
 	; 
 	(getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board))).
 
+%valid_moves(+Board, +Player, -ListOfMoves).
+% Returns the list of valid moves in ListOfMoves
 
 valid_moves(Board, Player, ListOfMoves) :-
     findall(Move, valid_move(Board,Player, Move), ListOfMoves).
