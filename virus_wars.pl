@@ -22,7 +22,7 @@ storeGameInfo([Player1Type, Player2Type], AI) :-
 			asserta(aiType(AI)).
 
 game(Player, Board) :- 
-			gameOver(Player, Board).
+			game_over(Player, Board).
 
 game(Player, Board) :- 
 			display_game(Player, Board),
@@ -30,14 +30,14 @@ game(Player, Board) :-
 			move(Player, PlayerType, Board, BoardOut, PlayerOut),
 			game(PlayerOut, BoardOut).
 
-gameOver(Player, Board) :-
+game_over(Player, Board) :-
 	not(valid_moves(Board, Player, _)),
 	nextPlayer(Player, PreviousPlayer),
 	getPlayerSymbol(PreviousPlayer, Symbol),
 	format('Player ~w won.~n', [Symbol]).
 
 
-
+%move(+Player, +PlayersType, +Board, -BoardOut, -PlayerOut).
 move(Player, 'user', Board, BoardOut, PlayerOut):-
 		playInput(Board, PlayerMove), !,
 		(checkMove(Player, PlayerMove, Board)
