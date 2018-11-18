@@ -1,3 +1,6 @@
+% mainMenu
+%   Print the main menu, with the game type options
+
 mainMenu :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
     write('┃           Virus Wars          ┃\n'),
@@ -9,6 +12,10 @@ mainMenu :-
     write('┃                               ┃\n'),
     write('┃  (0) - Exit                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
+
+
+% aiMenu
+%   Print the AI menu, with the game difficulty options
 
 aiMenu :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
@@ -22,11 +29,16 @@ aiMenu :-
     write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
+% dimMenu
+%   Print the dimensions menu, for dimensions choosing
+
 dimMenu :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
     write('┃        Board Dimensions       ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n').
 
+% firstPlayerMenu
+%   Print the first player menu, for choosing the player who will start the game
 
 firstPlayerMenu(['user', 'computer']) :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
@@ -50,9 +62,14 @@ firstPlayerMenu(_) :-
     write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
+% printPlayer
+%   Print the player who is currently playing
 
 printPlayer(Player) :-
     getPlayerSymbol(Player, Symbol),
     format('~n--------------- Player ~w ---------------~n', [Symbol]).
+
+% cls
+%   Clear the screen
 
 cls:-write('\e[H\e[2J').
