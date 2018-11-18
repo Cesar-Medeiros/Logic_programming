@@ -38,7 +38,7 @@ game(PreviuosPlayer, Board, Turn) :-
 		nextPlayer(PreviuosPlayer, Player, Turn, NewTurn),
 		display_game(Player, Board),
 		playerType(Player, PlayerType),
-		move(Player, PlayerType, Board, NewBoard),
+		move(Player-Turn, PlayerType, Board, NewBoard),
 		game(Player, NewBoard, NewTurn).
 
 game_over(Board, Player, Player):-
@@ -53,7 +53,7 @@ game_over(Board, Player, Opponent):-
 % Move
 % =====
 
-move(Player, 'user', Board, NewBoard):-
+move(Player-_, 'user', Board, NewBoard):-
 		repeat,
 		playInput(Board, Move),
 		retractall(visited(_)),
@@ -62,9 +62,9 @@ move(Player, 'user', Board, NewBoard):-
 		makeMove(Board, Player, Move, NewBoard).
 		
 
-move(Player, 'computer', Board, NewBoard):- 
+move(Player-Turn, 'computer', Board, NewBoard):- 
 		aiLevel(AILevel),
-		choose_move(Board, Player, AILevel, Move),
+		choose_move(Board, Player-Turn, AILevel, Move),
 		makeMove(Board, Player, Move, NewBoard).
 
 
@@ -97,17 +97,17 @@ getNewSymbol(Player, CurrentSymbol, NewSymbol):-
 % Choose Move
 % ============
 
-choose_move(Board, Player, 1, Move) :-
+choose_move(Board, Player-_, 1, Move) :-
 	valid_moves(Board, Player, ListOfMoves),
     length(ListOfMoves, Len),
     random(0, Len, Random),
     nth0(Random, ListOfMoves, Move).
 
-choose_move(Board, Player, 2, Move):-
-	ai(Board, Player, 1, Move).
+choose_move(Board, Player-Turn, 2, Move):-
+	ai(Board, Player-Turn, 1, Move).
 
-choose_move(Board, Player, 3, Move):-
-	ai(Board, Player, 3, Move).
+choose_move(Board, Player-Turn, 3, Move):-
+	ai(Board, Player-Turn, 3, Move).
 
 
 % ===========
@@ -118,15 +118,19 @@ valid_move(Board, Player, Move) :-
 	(getSymbol(Board, Move, 'empty') 
 	; 
 	(opponent(Player, Opponent), playerValue(Opponent, OpponentSymbol), getSymbol(Board, Move, OpponentSymbol))),
-	write('Here6\n'),
 	checkMoveChain(Player, Move, Board).
 
-checkMoveChain(_, [Row, Col], _) :-
-	visited([Row, Col]),
-	valid([Row, Col]),!.
+% checkMoveChain(_, [Row, Col], _) :-
+% 	% write('Here 1'),
+% 	visited([Row, Col]),
+% 	valid([Row, Col]),!.
 
 checkMoveChain(Player, [Row, Col], Board) :- 
-	not(visited([Row, Col])) -> asserta(visited([Row, Col])),
+	% write('Here 2'),
+	% not(visited([Row, Col])),
+	% assertz(visited([Row, Col])),
+	not(visited([Row, Col])),
+	asserta(visited([Row, Col])),
 
 	playerValue(Player, Symbol),
 	playerValueZ(Player, SymbolZ),

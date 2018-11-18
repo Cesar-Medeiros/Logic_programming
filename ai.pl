@@ -1,29 +1,27 @@
-ai(Board, Player, Lvl, Move) :-
-    minimax(Board, Player, Player, Move, _Val, Lvl),
+ai(Board, Player-Turn, Lvl, Move) :-
+    minimax(Board, Player-Turn, Player, Move, _Val, Lvl),
     write(Move).
 
-minimax(Board, Player, _, _, Val, 0) :-
-    write('Test1'),nl,
-    value(Board, Player, Val), 
-    write('EXIT'),!.
+minimax(Board, Player-_, MaxPlayer, _, Val, 0) :-
+    value(Board, Player, MaxPlayer, Val).
 
-minimax(Board, Player, MaxPlayer, BestNextMove, Val, Lvl) :-
+minimax(Board, Player-Turn, MaxPlayer, BestNextMove, Val, Lvl) :-
     Lvl1 is Lvl - 1,
     valid_moves(Board, Player, MovesList),
-    best(Board, MovesList, Player, MaxPlayer, BestNextMove, Val, Lvl1),
+    best(Board, MovesList, Player-Turn, MaxPlayer, BestNextMove, Val, Lvl1),
     !.
 
-minimax(_, Player, MaxPlayer, _, Val, _) :-
-    (Player = MaxPlayer, !, Val = -100; Val = 100).
+minimax(_, Player-_, MaxPlayer, _, Val, _) :-
+    value_no_moves(_, Player, MaxPlayer, Val).
 
-best(Board, MovesList, Player, MaxPlayer, BestNextMove, BestVal, Lvl) :-
+best(Board, MovesList, Player-Turn, MaxPlayer, BestNextMove, BestVal, Lvl) :-
     setof(
         Val-Move,
         (   
             member(Move, MovesList),
             makeMove(Board, Player, Move, NewBoard),
             nextPlayer(Player, NewPlayer, Turn, NewTurn),
-            minimax(NewBoard, NewPlayer, MaxPlayer, _, Val, Lvl)
+            minimax(NewBoard, NewPlayer-NewTurn, MaxPlayer, _, Val, Lvl)
         ), 
         ScoreList
         ),
@@ -42,6 +40,14 @@ best(Board, MovesList, Player, MaxPlayer, BestNextMove, BestVal, Lvl) :-
     nth0(N, BestMoves, BestNextMove).
 
 
-value(Board, Player, Val) :- 
+value(Board, Player, MaxPlayer, Val) :- 
+    value_move(Board, Player, MaxPlayer, Val) 
+    ; 
+    value_no_moves(Board, Player, MaxPlayer, Val).
+
+value_move(Board, Player, _, Val):-
     valid_moves(Board, Player, MovesList), 
     length(MovesList, L), Val = L. 
+
+value_no_moves(_, Player, MaxPlayer, Val):-
+    (Player = MaxPlayer, !, Val = -100; Val = 100).

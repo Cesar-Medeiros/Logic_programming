@@ -20,7 +20,12 @@ getPlayersType(PlayersType) :-
 	playersType(GameType, PlayersType).
     
 mainMenuInput(N) :-
-    input('Option', [N], checkMenuInput, 'Invalid Input').
+    input('Option', [N], checkMainMenuInput, 'Invalid Input').
+
+checkMainMenuInput([N]) :-
+    integer(N),
+    N>=0,
+    N=<3.
 
 playersType(1, ['user', 'user']).
 playersType(2, ['user', 'computer']).
@@ -41,7 +46,7 @@ firstPlayerMenuInput(FirstPlayer) :-
 
 checkPlayerInput([Player]) :-
     integer(Player),
-    Player>=0,
+    Player>=1,
     Player=<2.
 
 % ========
@@ -58,7 +63,7 @@ aiMenuInput(N) :-
 
 checkMenuInput([N]) :-
     integer(N),
-    N>=0,
+    N>=1,
     N=<3.
 
 aiType(1, 'level1').

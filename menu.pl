@@ -19,7 +19,6 @@ aiMenu :-
     write('┃  (2) - Level 2                ┃\n'),
     write('┃  (3) - Level 3                ┃\n'),
     write('┃                               ┃\n'),
-    write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
 dimMenu :-
@@ -36,7 +35,6 @@ firstPlayerMenu(['user', 'computer']) :-
     write('┃  (1) - Player ⨉   [You]       ┃\n'),
     write('┃  (2) - Player ◯   [Computer]  ┃\n'),
     write('┃                               ┃\n'),
-    write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
 firstPlayerMenu(_) :-
@@ -47,7 +45,6 @@ firstPlayerMenu(_) :-
     write('┃  (1) - Player ⨉               ┃\n'),
     write('┃  (2) - Player ◯               ┃\n'),
     write('┃                               ┃\n'),
-    write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
 
