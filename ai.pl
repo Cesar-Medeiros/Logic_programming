@@ -1,69 +1,24 @@
-% :- module(minimax, [minimax/3]).
-
-% minimax(Pos, BestNextPos, Val)
-% Pos is a position, Val is its minimax value.
-% Best move from Pos leads to position BestNextPos.
-
-
-% minimax(Board, Player, _, Val, 0) :-                     % Pos has no successors
-%     value(Board, Player, Val).
-
-% minimax(Board, Player, BestNextBoard, Val, Lvl) :-                     % Pos has successors
-%     Lvl1 is Lvl - 1,
-%     generateValidMoves(Player, List, Board),
-%     findall(NextBoard, (member(PlayCoords, List), makeMove(Board, Player, PlayCoords, NextBoard, _)), NextBoardList),
-%     best(NextBoardList, Player, BestNextBoard, ValAux, Lvl1),
-%     length(List, Len),
-%     Val is ValAux + Len,
-%     !.
-
-
-% minimax(Board, Player, _, Val, _) :-                     % Pos has no successors
-%     value(Board, Player, Val).
-
-
-
-% best([Board], Player, Board, Val, Lvl) :-
-%     nextPlayer(Player, Player2),
-%     minimax(Board, Player2, _, Val, Lvl), !.
-
-% best([Board1 | BoardList], Player, BestBoard, BestVal, Lvl) :-
-%     nextPlayer(Player, Player2),
-%     minimax(Board1,Player2, _, Val1, Lvl),
-%     best(BoardList, Player, Board2, Val2, Lvl),
-%     betterOf(Player2, Board1, Val1, Board2, Val2, BestBoard, BestVal).
-
-
-
-% betterOf(Player, Board1, Val1, _, Val2, Board1, Val1) :-   % Board1 better than Board2
-%     Player = 1,                         % MIN to move in Pos0
-%     Val1 > Val2, !                             % MAX prefers the greater value
-%     ;
-%     Player = 0,                         % MAX to move in Pos0
-%     Val1 < Val2, !.                            % MIN prefers the lesser value
-
-% betterOf(_Player,_Board1, _Val1, Board2, Val2, Board2, Val2).        % Otherwise Pos1 better than Pos0
-
-value(_, 0, 100).
-value(_, 1, -100).
-
-
 ai(Board, Player, Lvl, Move) :-
-    minimax(Board, Player, Player, Move, _Val, Lvl).
+    minimax(Board, Player, Player, Move, _Val, Lvl),
+    write(Move).
 
 minimax(Board, Player, _, _, Val, 0) :-
-    value(Board, Player, Val), !.
+    write('Test1'),nl,
+    value(Board, Player, Val), 
+    write('EXIT'),!.
 
 minimax(Board, Player, MaxPlayer, BestNextMove, Val, Lvl) :-
-    write(Lvl),nl,
+    write('Test2'),nl,
     Lvl1 is Lvl - 1,
     valid_moves(Board, Player, MovesList),
-    best(Board, MovesList, Player, MaxPlayer, BestNextMove, ValAux, Lvl1),
-    length(MovesList, Len),
-    Val is ValAux + Len,
+    % write('Level: '), write(Lvl), nl, write('Moves List: '), write(MovesList), nl,
+    % printBoard(Board),
+    best(Board, MovesList, Player, MaxPlayer, BestNextMove, Val, Lvl1),
+    write('Minimax'), write(BestNextMove),nl,
     !.
 
 minimax(Board, Player, _, _, Val, _) :-
+    write('FAILED'),nl,
     value(Board, Player, Val), !.
 
 best(Board, MovesList, Player, MaxPlayer, BestNextMove, BestVal, Lvl) :-
@@ -72,14 +27,27 @@ best(Board, MovesList, Player, MaxPlayer, BestNextMove, BestVal, Lvl) :-
         (   
             member(Move, MovesList),
             makeMove(Board, Player, Move, NewBoard, NewPlayer),
-            minimax(NewBoard, NewPlayer, MaxPlayer, BestNextMove, Val, Lvl)
+            minimax(NewBoard, NewPlayer, MaxPlayer, _, Val, Lvl),
+            write('Best'), nl
         ), 
         ScoreList
         ),
-        
-    length(ScoreList, Len),
     
     (Player = MaxPlayer, !, 
-        nth0(0, ScoreList, BestVal-BestNextMove)
+        Index is 0
         ; 
-        Last is Len - 1, nth0(Last, ScoreList, BestVal-BestNextMove)).
+        length(ScoreList, ScoreListLen),
+        Index is ScoreListLen - 1
+    ),
+    
+    nth0(Index, ScoreList, BestVal-_),
+    findall(Move, member(BestVal-Move, ScoreList), BestMoves),
+    length(BestMoves, BestMovesLen),
+    random(0, BestMovesLen, N),
+    nth0(N, BestMoves, BestNextMove).
+
+
+
+value(Board, Player, Val) :- 
+    valid_moves(Board, Player, MovesList), 
+    length(MovesList, L), Val = L. 

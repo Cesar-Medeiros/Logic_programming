@@ -56,6 +56,8 @@ game_over(Board, Player, Winner):-
 
 move(Player, 'user', Board, NewBoard, NewPlayer):-
 		playInput(Board, Move),
+		retractall(visited(_)),
+		retractall(valid(_)),
 		valid_move(Board, Player, Move),
 		makeMove(Board, Player, Move, NewBoard, NewPlayer).
 
@@ -119,11 +121,13 @@ valid_move(Board, Player, Move) :-
 	(getSymbol(Board, Move, 'empty') 
 	; 
 	(opponent(Player, Opponent), playerValue(Opponent, OpponentSymbol), getSymbol(Board, Move, OpponentSymbol))),
-	retractall(visited(_)),
 	checkMoveChain(Player, Move, Board).
 
+checkMoveChain(Player, [Row, Col], Board) :-
+	visited([Row, Col]),
+	valid([Row, Col]), !.
+
 checkMoveChain(Player, [Row, Col], Board) :- 
-	not(visited([Row, Col])),
 	asserta(visited([Row, Col])),
 
 	playerValue(Player, Symbol),
@@ -136,13 +140,16 @@ checkMoveChain(Player, [Row, Col], Board) :-
 	isPositionValid(Board, [NRow, NCol]),
 	(getSymbol(Board, [NRow, NCol], Symbol) 
 	; 
-	(getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board))).
+	(getSymbol(Board, [NRow, NCol], SymbolZ), checkMoveChain(Player, [NRow, NCol], Board))),
+	asserta(valid([NRow, NCol])).
 
 %valid_moves(+Board, +Player, -ListOfMoves).
 % Returns the list of valid moves in ListOfMoves
 
 valid_moves(Board, Player, ListOfMoves) :-
-    findall(Move, valid_move(Board,Player, Move), ListOfMoves).
+	retractall(visited(_)),
+	retractall(valid(_)),
+    setof(Move, valid_move(Board,Player, Move), ListOfMoves).
 
 
 
