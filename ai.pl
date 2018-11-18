@@ -70,7 +70,8 @@ best(Board, MovesList, Player, MaxPlayer, BestNextMove, BestVal, Lvl) :-
         Val-Move,
         (   
             member(Move, MovesList),
-            makeMove(Board, Player, Move, NewBoard, NewPlayer),
+            makeMove(Board, Player, Move, NewBoard),
+            NewPlayer is (Player +1) mod 2,
             minimax(NewBoard, NewPlayer, MaxPlayer, BestNextMove, Val, Lvl)
         ), 
         ScoreList

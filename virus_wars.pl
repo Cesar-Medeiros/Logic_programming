@@ -18,7 +18,7 @@ play :-
 		storeGameInfo(PlayersType, AI),
 		createBoard(BoardCells, Dim),
 		Board = BoardCells-Dim,
-		game(FirstPlayer, Board).
+		game(FirstPlayer, Board, 3).
 
 storeGameInfo([Player1Type, Player2Type], AI) :-
 		asserta(playerType(0, Player1Type)),
@@ -31,17 +31,18 @@ storeGameInfo([Player1Type, Player2Type], AI) :-
 % Game
 % =====
 
-game(Player, Board) :- 
+game(Player, Board, _) :- 
 		game_over(Board, Player, Winner),
 		getPlayerSymbol(Winner, Symbol),
 		display_game(Player, Board),
 		format('Player ~w won.~n', [Symbol]).
 
-game(Player, Board) :- 
+game(Player, Board, Turn) :- 
 		display_game(Player, Board),
 		playerType(Player, PlayerType),
-		move(Player, PlayerType, Board, NewBoard, NewPlayer),
-		game(NewPlayer, NewBoard).
+		move(Player, PlayerType, Board, NewBoard),
+		nextPlayer(Player, NewPlayer, Turn, NewTurn),
+		game(NewPlayer, NewBoard, NewTurn).
 
 game_over(Board, Player, Winner):-
 		valid_moves(Board, Player, ListOfMoves),
@@ -54,31 +55,30 @@ game_over(Board, Player, Winner):-
 % Move
 % =====
 
-move(Player, 'user', Board, NewBoard, NewPlayer):-
+move(Player, 'user', Board, NewBoard):-
 		playInput(Board, Move),
 		valid_move(Board, Player, Move),
-		makeMove(Board, Player, Move, NewBoard, NewPlayer).
+		makeMove(Board, Player, Move, NewBoard).
 
-move(Player, 'user', Board, Board, Player):-
+move(_, 'user', Board, Board):-
 		write('\nInvalid Move\n').
 
-move(Player, 'computer', Board, NewBoard, NewPlayer):- 
+move(Player, 'computer', Board, NewBoard):- 
 		aiLevel(AILevel),
 		choose_move(Board, Player, AILevel, Move),
-		makeMove(Board, Player, Move, NewBoard, NewPlayer).
+		makeMove(Board, Player, Move, NewBoard).
 
 
 % ==========
 % Make Move
 % ==========
 
-% makeMove(+Board, +Player, -NewBoard, -NewPlayer)
-%   Responsible for making a move and return the next board and player
-makeMove(Board, Player, Move, NewBoard, NewPlayer) :- 
+% makeMove(+Board, +Player, -NewBoard)
+%   Responsible for making a move and return the next board
+makeMove(Board, Player, Move, NewBoard) :- 
 		getSymbol(Board, Move, CurrentSymbol), 
 		getNewSymbol(Player, CurrentSymbol, NewSymbol),
-		setSymbol(Board, Move, NewSymbol, NewBoard),
-		nextPlayer(Player, NewPlayer).
+		setSymbol(Board, Move, NewSymbol, NewBoard).
 
 
 % ===========
@@ -151,4 +151,5 @@ valid_moves(Board, Player, ListOfMoves) :-
 % ============
 
 opponent(Player, Opponent) :- Opponent is (Player + 1) mod 2.
-nextPlayer(PlayerIn, NewPlayer) :- NewPlayer is (PlayerIn + 1) mod 2.
+nextPlayer(PlayerIn, NewPlayer, 1, 3) :- NewPlayer is (PlayerIn + 1) mod 2.
+nextPlayer(PlayerIn, PlayerIn, Turn, NewTurn) :- NewTurn is Turn - 1.
