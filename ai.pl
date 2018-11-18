@@ -55,7 +55,6 @@ minimax(Board, Player, _, _, Val, 0) :-
     value(Board, Player, Val), !.
 
 minimax(Board, Player, MaxPlayer, BestNextMove, Val, Lvl) :-
-    write(Lvl),nl,
     Lvl1 is Lvl - 1,
     valid_moves(Board, Player, MovesList),
     best(Board, MovesList, Player, MaxPlayer, BestNextMove, ValAux, Lvl1),

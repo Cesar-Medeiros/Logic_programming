@@ -4,7 +4,7 @@
 
 getGameInfo(PlayersType, FirstPlayer, AILevel, Dim) :-
     getPlayersType(PlayersType),
-    getFirstPlayer(FirstPlayer),
+    getFirstPlayer(FirstPlayer, PlayersType),
     getAILevel(AILevel, PlayersType),
     getDim(Dim).
 
@@ -31,8 +31,8 @@ playersType(3, ['computer', 'computer']).
 % First Player
 % =============
 
-getFirstPlayer(FirstPlayer) :-
-    firstPlayerMenu,
+getFirstPlayer(FirstPlayer, PlayersType) :-
+    firstPlayerMenu(PlayersType),
     firstPlayerMenuInput(FirstPlayer).
 
 firstPlayerMenuInput(FirstPlayer) :-
