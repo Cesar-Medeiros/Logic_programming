@@ -72,7 +72,7 @@ move(Player, 'computer', Board, NewBoard):-
 % Make Move
 % ==========
 
-% makeMove(+Board, +Player, -NewBoard)
+% makeMove(+Board, +Player, +Move, -NewBoard)
 %   Responsible for making a move and return the next board
 makeMove(Board, Player, Move, NewBoard):- 
 		getSymbol(Board, Move, CurrentSymbol), 
