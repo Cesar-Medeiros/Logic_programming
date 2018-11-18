@@ -6,8 +6,7 @@
 :- dynamic('visited/1').
 :- dynamic('aiLevel/1').
 :- dynamic('playerType/2').
-
-
+:- dynamic('isFirstMove/1').
 
 % =====
 % Play
@@ -18,32 +17,34 @@ play :-
 		storeGameInfo(PlayersType, AI),
 		createBoard(BoardCells, Dim),
 		Board = BoardCells-Dim,
-		game(FirstPlayer, Board).
+		game(FirstPlayer, Board, 3).
 
 storeGameInfo([Player1Type, Player2Type], AI) :-
 		asserta(playerType(0, Player1Type)),
 		asserta(playerType(1, Player2Type)),
-		asserta(aiLevel(AI)).
-
-
+		asserta(aiLevel(AI)),
+		asserta(isFirstMove(0)),
+		asserta(isFirstMove(1)).
 
 % =====
 % Game
 % =====
 
-game(Player, Board) :- 
+game(Player, Board, _) :- 
 		game_over(Board, Player, Winner),
 		getPlayerSymbol(Winner, Symbol),
 		display_game(Player, Board),
-		format('Player ~w won.~n', [Symbol]).
+		format('Player ~w   won.~n', [Symbol]).
 
-game(Player, Board) :- 
+game(Player, Board, Turn) :- 
 		display_game(Player, Board),
 		playerType(Player, PlayerType),
-		move(Player, PlayerType, Board, NewBoard, NewPlayer),
-		game(NewPlayer, NewBoard).
+		move(Player, PlayerType, Board, NewBoard, NewPlayer, Turn, NewTurn),
+		game(NewPlayer, NewBoard, NewTurn).
 
 game_over(Board, Player, Winner):-
+		\+ isFirstMove(0),
+		\+ isFirstMove(1),
 		valid_moves(Board, Player, ListOfMoves),
 		length(ListOfMoves, Len), !,
 		Len = 0,
@@ -54,33 +55,33 @@ game_over(Board, Player, Winner):-
 % Move
 % =====
 
-move(Player, 'user', Board, NewBoard, NewPlayer):-
+move(Player, 'user', Board, NewBoard, NewPlayer, Turn, NewTurn):-
 		playInput(Board, Move),
 		retractall(visited(_)),
 		retractall(valid(_)),
 		valid_move(Board, Player, Move),
-		makeMove(Board, Player, Move, NewBoard, NewPlayer).
+		makeMove(Board, Player, Move, NewBoard, NewPlayer,Turn, NewTurn).
 
-move(Player, 'user', Board, Board, Player):-
+move(Player, 'user', Board, Board, Player, Turn, Turn):-
 		write('\nInvalid Move\n').
 
-move(Player, 'computer', Board, NewBoard, NewPlayer):- 
+move(Player, 'computer', Board, NewBoard, NewPlayer, Turn, NewTurn):- 
 		aiLevel(AILevel),
 		choose_move(Board, Player, AILevel, Move),
-		makeMove(Board, Player, Move, NewBoard, NewPlayer).
+		makeMove(Board, Player, Move, NewBoard, NewPlayer,Turn, NewTurn).
 
 
 % ==========
 % Make Move
 % ==========
 
-% makeMove(+Board, +Player, -NewBoard, -NewPlayer)
-%   Responsible for making a move and return the next board and player
-makeMove(Board, Player, Move, NewBoard, NewPlayer) :- 
+% makeMove(+Board, +Player, -NewBoard)
+%   Responsible for making a move and return the next board
+makeMove(Board, Player, Move, NewBoard, NewPlayer, Turn, NewTurn):- 
 		getSymbol(Board, Move, CurrentSymbol), 
 		getNewSymbol(Player, CurrentSymbol, NewSymbol),
 		setSymbol(Board, Move, NewSymbol, NewBoard),
-		nextPlayer(Player, NewPlayer).
+		nextPlayer(Player, NewPlayer, Turn, NewTurn).
 
 
 % ===========
@@ -118,6 +119,9 @@ choose_move(Board, Player, 3, Move):-
 % ===========
 
 valid_move(Board, Player, Move) :-
+	isFirstMove(Player), !, valid_first_move(Board, Player, Move), !, retract(isFirstMove(Player)).
+
+valid_move(Board, Player, Move) :-
 	(getSymbol(Board, Move, 'empty') 
 	; 
 	(opponent(Player, Opponent), playerValue(Opponent, OpponentSymbol), getSymbol(Board, Move, OpponentSymbol))),
@@ -126,6 +130,9 @@ valid_move(Board, Player, Move) :-
 checkMoveChain(Player, [Row, Col], Board) :-
 	visited([Row, Col]),
 	valid([Row, Col]), !.
+
+valid_first_move(_, 0, [_, Col]) :-  Col == 1.
+valid_first_move(_-[_, Cols], 1, [_, Col]) :- Col == Cols.
 
 checkMoveChain(Player, [Row, Col], Board) :- 
 	asserta(visited([Row, Col])),
@@ -158,4 +165,5 @@ valid_moves(Board, Player, ListOfMoves) :-
 % ============
 
 opponent(Player, Opponent) :- Opponent is (Player + 1) mod 2.
-nextPlayer(PlayerIn, NewPlayer) :- NewPlayer is (PlayerIn + 1) mod 2.
+nextPlayer(PlayerIn, NewPlayer, 1, 3) :- NewPlayer is (PlayerIn + 1) mod 2.
+nextPlayer(PlayerIn, PlayerIn, Turn, NewTurn) :- NewTurn is Turn - 1.

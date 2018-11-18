@@ -4,7 +4,7 @@
 
 getGameInfo(PlayersType, FirstPlayer, AILevel, Dim) :-
     getPlayersType(PlayersType),
-    getFirstPlayer(FirstPlayer),
+    getFirstPlayer(FirstPlayer, PlayersType),
     getAILevel(AILevel, PlayersType),
     getDim(Dim).
 
@@ -31,8 +31,8 @@ playersType(3, ['computer', 'computer']).
 % First Player
 % =============
 
-getFirstPlayer(FirstPlayer) :-
-    firstPlayerMenu,
+getFirstPlayer(FirstPlayer, PlayersType) :-
+    firstPlayerMenu(PlayersType),
     firstPlayerMenuInput(FirstPlayer).
 
 firstPlayerMenuInput(FirstPlayer) :-
@@ -76,9 +76,9 @@ getDim(Dim) :-
 
 dimInput(NRows, NCols) :-
     input('Number of Rows', [NRows], checkDim, 'Invalid number of rows'),
-    input('Number of Collumns', [NCols], checkDim, 'Invalid number of columns').
+    input('Number of Columns', [NCols], checkDim, 'Invalid number of columns').
 
-checkDim(N) :- N > 0.
+checkDim(N) :- N > 3, N < 20.
 
 
 % ===========

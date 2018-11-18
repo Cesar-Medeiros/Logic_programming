@@ -27,18 +27,28 @@ dimMenu :-
     write('┃        Board Dimensions       ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n').
 
-firstPlayerMenu :-
+
+firstPlayerMenu(['user', 'computer']) :-
     write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
     write('┃         First Player          ┃\n'),
     write('┠───────────────────────────────┨\n'),
     write('┃                               ┃\n'),
-    write('┃  (1) - Player ◯               ┃\n'),
-    write('┃  (2) - Player ⨉               ┃\n'),
+    write('┃  (1) - Player ⨉   [You]       ┃\n'),
+    write('┃  (2) - Player ◯   [Computer]  ┃\n'),
     write('┃                               ┃\n'),
     write('┃  (0) - Back                   ┃\n'),
     write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
-
+firstPlayerMenu(_) :-
+    write('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓\n'),
+    write('┃         First Player          ┃\n'),
+    write('┠───────────────────────────────┨\n'),
+    write('┃                               ┃\n'),
+    write('┃  (1) - Player ⨉               ┃\n'),
+    write('┃  (2) - Player ◯               ┃\n'),
+    write('┃                               ┃\n'),
+    write('┃  (0) - Back                   ┃\n'),
+    write('┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛\n\n').
 
 
 printPlayer(Player) :-
