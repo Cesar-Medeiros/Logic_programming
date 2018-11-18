@@ -76,9 +76,9 @@ getDim(Dim) :-
 
 dimInput(NRows, NCols) :-
     input('Number of Rows', [NRows], checkDim, 'Invalid number of rows'),
-    input('Number of Collumns', [NCols], checkDim, 'Invalid number of columns').
+    input('Number of Columns', [NCols], checkDim, 'Invalid number of columns').
 
-checkDim(N) :- N > 0.
+checkDim(N) :- N > 3, N < 20.
 
 
 % ===========
