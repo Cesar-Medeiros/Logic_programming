@@ -1,6 +1,12 @@
-ai(Board, Player-Turn, Lvl, Move) :-
-    minimax(Board, Player-Turn, Player, Move, _Val, Lvl),
-    write(Move).
+% ai(+Board, +Player, +Lvl, -Move)
+%   Generate move acording to the board, the active player, and the level of difficulty
+
+ai(Board, Player, Lvl, Move) :-
+    minimax(Board, Player, Player, Move, _Val, Lvl).
+
+
+% minimax(+Board, +Player, +MaxPlayer, -Move, -Val, +Lvl)
+%   Generate move and its value acording to the board, the active player, the player whose move is to be maximized, and the level of difficulty
 
 minimax(Board, Player-_, MaxPlayer, _, Val, 0) :-
     value(Board, Player, MaxPlayer, Val).
@@ -13,6 +19,9 @@ minimax(Board, Player-Turn, MaxPlayer, BestNextMove, Val, Lvl) :-
 
 minimax(_, Player-_, MaxPlayer, _, Val, _) :-
     value_no_moves(_, Player, MaxPlayer, Val).
+
+% best(+Board, +MovesList, +Player, +MaxPlayer, -BestNextMove, -BestVal, +Lvl)
+%   Choose the best move from a list of possibilities, along with its value
 
 best(Board, MovesList, Player-Turn, MaxPlayer, BestNextMove, BestVal, Lvl) :-
     setof(
@@ -39,7 +48,8 @@ best(Board, MovesList, Player-Turn, MaxPlayer, BestNextMove, BestVal, Lvl) :-
     random(0, BestMovesLen, N),
     nth0(N, BestMoves, BestNextMove).
 
-
+% value(+Board, +Player, +MaxPlayer, -Val)
+% Calculate the value of a Board, from the prespective of a Player
 value(Board, Player, MaxPlayer, Val) :- 
     value_move(Board, Player, MaxPlayer, Val) 
     ; 
