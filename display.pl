@@ -123,12 +123,14 @@ printChar(C, N) :-
         printChar(C, N1).
 
 
-
+% getPlayerSymbol(+Player, -Symbol)
+%   Get the Symbol that represents a Player
 getPlayerSymbol(Player, Symbol) :- 
         playerValue(Player, Value), 
         symbol(Value, Symbol).
-    
-    
+
+% playerValue(+Player, -Symbol)
+%       Translate player and status and its state to string     
 playerValue(0, 'bAliv').
 playerValue(1, 'rAliv').
 playerValueZ(0, 'bDead').
