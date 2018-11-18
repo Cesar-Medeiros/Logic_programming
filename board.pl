@@ -1,7 +1,10 @@
 % board(+Board)
 %   Select a Board to start the game with
 createBoard(Board, [Rows, Cols]) :-
-            findall(cell(R, C, 'empty'), (between(1, Rows, R), between(1, Cols, C)),  Board).
+            findall(cell(R, C, 'empty'), (between(1, Rows, R), between(1, Cols, C)),  Board1),
+            setSymbol(Board1-_, [Rows, 1], 'bAliv',Board2-_),
+            setSymbol(Board2-_, [1, Cols], 'rAliv',Board3-_),
+            Board = Board3.
 
 getSymbol(BoardCell-_Dim, [Row, Col], Value) :- 
             member(cell(Row, Col, Value), BoardCell).

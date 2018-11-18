@@ -39,7 +39,8 @@ firstPlayerMenuInput(FirstPlayer) :-
     input('Option', [PlayerOption], checkPlayerInput, 'Invalid Input'),
     FirstPlayer is PlayerOption - 1.
 
-checkPlayerInput(Player) :-
+checkPlayerInput([Player]) :-
+    integer(Player),
     Player>=0,
     Player=<2.
 
@@ -52,10 +53,12 @@ getAILevel(AILevel, _PlayersType) :-
     aiMenu,
 	aiMenuInput(AILevel).
 
-aiMenuInput(N) :-
+aiMenuInput([N]) :-
+    integer(N),
     input('Option', [N], checkMenuInput, 'Invalid Input').
 
-checkMenuInput(N) :-
+checkMenuInput([N]) :-
+    integer(N),
     N>=0,
     N=<3.
 
@@ -78,7 +81,10 @@ dimInput(NRows, NCols) :-
     input('Number of Rows', [NRows], checkDim, 'Invalid number of rows'),
     input('Number of Columns', [NCols], checkDim, 'Invalid number of columns').
 
-checkDim(N) :- N > 3, N < 20.
+checkDim([N]) :- 
+    integer(N),
+    N > 1, 
+    N < 15.
 
 
 % ===========
@@ -93,12 +99,13 @@ playInput(_-[NRows, NCols], [Row, Col]) :-
     Col is CodeC - CodeA + 1.
 
 checkRows([Row, NRows]) :-
-    number(Row),
+    integer(Row),
     Row>=1,
     Row=<NRows.
 
 checkCols([Col, NCols]) :-
     is_alpha(Col),
+    is_lower(Col),    
     char_code('a', CodeA),
     char_code(Col, CodeC),
     CodeC >= CodeA,
@@ -111,9 +118,8 @@ checkCols([Col, NCols]) :-
 input(Prompt, [Value|Rest], CheckPred, ErrorMsg) :-
     repeat,
     format('~w: \n', [Prompt]),
-    read(Value),
-
-    (   call(CheckPred, [Value|Rest])
+    
+    (   catch(read(Value), _, fail), call(CheckPred, [Value|Rest])
     ->  true, !
     ;   format('ERROR: ~w.~n', [ErrorMsg]),
         fail
