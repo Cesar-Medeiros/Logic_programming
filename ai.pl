@@ -21,7 +21,8 @@ best(Board, MovesList, Player, MaxPlayer, BestNextMove, BestVal, Lvl) :-
         Val-Move,
         (   
             member(Move, MovesList),
-            makeMove(Board, Player, Move, NewBoard, NewPlayer, Turn, NewTurn),
+            makeMove(Board, Player, Move, NewBoard),
+            nextPlayer(Player, NewPlayer, Turn, NewTurn),
             minimax(NewBoard, NewPlayer, MaxPlayer, _, Val, Lvl)
         ), 
         ScoreList

@@ -16,7 +16,7 @@ play :-
 		storeGameInfo(PlayersType, AI),
 		createBoard(BoardCells, Dim),
 		Board = BoardCells-Dim,
-		game(FirstPlayer, Board, 3).
+		game(FirstPlayer, Board, 4).
 
 storeGameInfo([Player1Type, Player2Type], AI) :-
 		asserta(playerType(0, Player1Type)),
@@ -28,42 +28,44 @@ storeGameInfo([Player1Type, Player2Type], AI) :-
 % =====
 
 game(Player, Board, _) :- 
+		write(Player),
 		game_over(Board, Player, Winner),
 		getPlayerSymbol(Winner, Symbol),
 		display_game(Player, Board),
-		format('Player ~w   won.~n', [Symbol]).
+		format('Player ~w won.~n', [Symbol]).
 
-game(Player, Board, Turn) :- 
+game(PreviuosPlayer, Board, Turn) :- 
+		nextPlayer(PreviuosPlayer, Player, Turn, NewTurn),
 		display_game(Player, Board),
 		playerType(Player, PlayerType),
-		move(Player, PlayerType, Board, NewBoard, NewPlayer, Turn, NewTurn),
-		game(NewPlayer, NewBoard, NewTurn).
+		move(Player, PlayerType, Board, NewBoard),
+		game(Player, NewBoard, NewTurn).
 
-game_over(Board, Player, Winner):-
-		valid_moves(Board, Player, ListOfMoves),
-		length(ListOfMoves, Len), !,
-		Len = 0,
-		opponent(Player, Winner).
-	
+game_over(Board, Player, Player):-
+		opponent(Player, Opponent),
+		\+(valid_moves(Board, Opponent, _)).
+
+game_over(Board, Player, Opponent):-
+		\+(valid_moves(Board, Player, _)), 
+		opponent(Player, Opponent).
 
 % =====
 % Move
 % =====
 
-move(Player, 'user', Board, NewBoard, NewPlayer, Turn, NewTurn):-
+move(Player, 'user', Board, NewBoard):-
+		repeat,
 		playInput(Board, Move),
 		retractall(visited(_)),
 		retractall(valid(_)),
-		valid_move(Board, Player, Move),
-		makeMove(Board, Player, Move, NewBoard, NewPlayer,Turn, NewTurn).
+		(valid_move(Board, Player, Move) , ! ; write('[Invalid Move]\n\n'), fail),
+		makeMove(Board, Player, Move, NewBoard).
+		
 
-move(Player, 'user', Board, Board, Player, Turn, Turn):-
-		write('\nInvalid Move\n').
-
-move(Player, 'computer', Board, NewBoard, NewPlayer, Turn, NewTurn):- 
+move(Player, 'computer', Board, NewBoard):- 
 		aiLevel(AILevel),
 		choose_move(Board, Player, AILevel, Move),
-		makeMove(Board, Player, Move, NewBoard, NewPlayer,Turn, NewTurn).
+		makeMove(Board, Player, Move, NewBoard).
 
 
 % ==========
@@ -72,11 +74,10 @@ move(Player, 'computer', Board, NewBoard, NewPlayer, Turn, NewTurn):-
 
 % makeMove(+Board, +Player, -NewBoard)
 %   Responsible for making a move and return the next board
-makeMove(Board, Player, Move, NewBoard, NewPlayer, Turn, NewTurn):- 
+makeMove(Board, Player, Move, NewBoard):- 
 		getSymbol(Board, Move, CurrentSymbol), 
 		getNewSymbol(Player, CurrentSymbol, NewSymbol),
-		setSymbol(Board, Move, NewSymbol, NewBoard),
-		nextPlayer(Player, NewPlayer, Turn, NewTurn).
+		setSymbol(Board, Move, NewSymbol, NewBoard).
 
 
 % ===========
@@ -117,14 +118,15 @@ valid_move(Board, Player, Move) :-
 	(getSymbol(Board, Move, 'empty') 
 	; 
 	(opponent(Player, Opponent), playerValue(Opponent, OpponentSymbol), getSymbol(Board, Move, OpponentSymbol))),
+	write('Here6\n'),
 	checkMoveChain(Player, Move, Board).
 
-checkMoveChain(Player, [Row, Col], Board) :-
+checkMoveChain(_, [Row, Col], _) :-
 	visited([Row, Col]),
-	valid([Row, Col]), !.
+	valid([Row, Col]),!.
 
 checkMoveChain(Player, [Row, Col], Board) :- 
-	asserta(visited([Row, Col])),
+	not(visited([Row, Col])) -> asserta(visited([Row, Col])),
 
 	playerValue(Player, Symbol),
 	playerValueZ(Player, SymbolZ),
@@ -144,7 +146,7 @@ checkMoveChain(Player, [Row, Col], Board) :-
 valid_moves(Board, Player, ListOfMoves) :-
 	retractall(visited(_)),
 	retractall(valid(_)),
-    setof(Move, valid_move(Board,Player, Move), ListOfMoves).
+    setof(Move, valid_move(Board,Player, Move), ListOfMoves), !.
 
 
 

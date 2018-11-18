@@ -53,8 +53,7 @@ getAILevel(AILevel, _PlayersType) :-
     aiMenu,
 	aiMenuInput(AILevel).
 
-aiMenuInput([N]) :-
-    integer(N),
+aiMenuInput(N) :-
     input('Option', [N], checkMenuInput, 'Invalid Input').
 
 checkMenuInput([N]) :-
@@ -104,8 +103,10 @@ checkRows([Row, NRows]) :-
     Row=<NRows.
 
 checkCols([Col, NCols]) :-
-    is_alpha(Col),
-    is_lower(Col),    
+    atom(Col),
+    atom_length(Col, Len),
+    Len = 1,
+    char_type(Col, lower),
     char_code('a', CodeA),
     char_code(Col, CodeC),
     CodeC >= CodeA,
