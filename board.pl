@@ -1,7 +1,10 @@
 % createBoard(+Board, +Dim)
 %   Create a board with dimension Dim
 createBoard(Board, [Rows, Cols]) :-
-            findall(cell(R, C, 'empty'), (between(1, Rows, R), between(1, Cols, C)),  Board).
+            findall(cell(R, C, 'empty'), (between(1, Rows, R), between(1, Cols, C)),  Board1),
+            setSymbol(Board1-_, [Rows, 1], 'bAliv',Board2-_),
+            setSymbol(Board2-_, [1, Cols], 'rAliv',Board3-_),
+            Board = Board3.
 
 % getSymbol(Board, Position, Value)
 %   Gets the value present in a certain position of Board

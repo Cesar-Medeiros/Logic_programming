@@ -6,7 +6,6 @@
 :- dynamic('visited/1').
 :- dynamic('aiLevel/1').
 :- dynamic('playerType/2').
-:- dynamic('isFirstMove/1').
 
 % =====
 % Play
@@ -22,9 +21,7 @@ play :-
 storeGameInfo([Player1Type, Player2Type], AI) :-
 		asserta(playerType(0, Player1Type)),
 		asserta(playerType(1, Player2Type)),
-		asserta(aiLevel(AI)),
-		asserta(isFirstMove(0)),
-		asserta(isFirstMove(1)).
+		asserta(aiLevel(AI)).
 
 % =====
 % Game
@@ -43,8 +40,6 @@ game(Player, Board, Turn) :-
 		game(NewPlayer, NewBoard, NewTurn).
 
 game_over(Board, Player, Winner):-
-		\+ isFirstMove(0),
-		\+ isFirstMove(1),
 		valid_moves(Board, Player, ListOfMoves),
 		length(ListOfMoves, Len), !,
 		Len = 0,
@@ -119,9 +114,6 @@ choose_move(Board, Player, 3, Move):-
 % ===========
 
 valid_move(Board, Player, Move) :-
-	isFirstMove(Player), !, valid_first_move(Board, Player, Move), !, retract(isFirstMove(Player)).
-
-valid_move(Board, Player, Move) :-
 	(getSymbol(Board, Move, 'empty') 
 	; 
 	(opponent(Player, Opponent), playerValue(Opponent, OpponentSymbol), getSymbol(Board, Move, OpponentSymbol))),
@@ -130,9 +122,6 @@ valid_move(Board, Player, Move) :-
 checkMoveChain(Player, [Row, Col], Board) :-
 	visited([Row, Col]),
 	valid([Row, Col]), !.
-
-valid_first_move(_, 0, [_, Col]) :-  Col == 1.
-valid_first_move(_-[_, Cols], 1, [_, Col]) :- Col == Cols.
 
 checkMoveChain(Player, [Row, Col], Board) :- 
 	asserta(visited([Row, Col])),
@@ -152,7 +141,6 @@ checkMoveChain(Player, [Row, Col], Board) :-
 
 %valid_moves(+Board, +Player, -ListOfMoves).
 % Returns the list of valid moves in ListOfMoves
-
 valid_moves(Board, Player, ListOfMoves) :-
 	retractall(visited(_)),
 	retractall(valid(_)),
