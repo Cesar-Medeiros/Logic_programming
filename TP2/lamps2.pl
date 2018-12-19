@@ -1,52 +1,39 @@
 :-use_module(library(clpfd)).
 :-use_module(library(lists)).
+:- consult(boards).
 
 % getBoard([[4, 6, 6, 5],[5, 2, 6, 4],[4, 6, 6, 6],[4, 6, 6, 4]]).
 
 
-getBoard([
-        cell(1, 1, 2),
-        cell(1, 2, 1),
-        cell(1, 3, 1),
-        cell(1, 4, 2),
+solve(Board) :-
+    statistics(runtime, [T1|_]),
+    getBoardDim(Board, Dim),
+    
+    length(TopRow, Dim),      domain(TopRow, 0, Dim),
+    length(RightRow, Dim),    domain(RightRow, 0, Dim),
+    length(BottomRow, Dim),   domain(BottomRow, 0, Dim),
+    length(LeftRow, Dim),     domain(LeftRow, 0, Dim),
 
-        cell(2, 1, 1),
-        cell(2, 2, 0),
-        cell(2, 3, 0),
-        cell(2, 4, 1),
-
-        cell(3, 1, 1),
-        cell(3, 2, 0),
-        cell(3, 3, 0),
-        cell(3, 4, 1),
-
-        cell(4, 1, 2),
-        cell(4, 2, 1),
-        cell(4, 3, 1),
-        cell(4, 4, 2)
-    ]).
-
-solve:-
-    length(TopRow, 4),      domain(TopRow, 0, 4),
-    length(RightRow, 4),    domain(RightRow, 0, 4),
-    length(BottomRow, 4),   domain(BottomRow, 0, 4),
-    length(LeftRow, 4),     domain(LeftRow, 0, 4),
-
-    getBoard(Board),
-
-    restrict_board(Board, TopRow, BottomRow, RightRow, LeftRow),
+    restrict_board(Board, Dim, TopRow, BottomRow, RightRow, LeftRow),
 
     append([TopRow, BottomRow, RightRow, LeftRow], List),
-
     labeling([], List),
+    write('Result: '),
     write(List),
-    write('\n'),
-    fail.
+    nl,
 
+    statistics(runtime, [T2|_]),
+    T3 is T2 - T1,
+    write('Time: '),
+    write(T3).
 
-restrict_board([], TopRow, BottomRow, RightRow, LeftRow).
+getBoardDim(Board, Dim) :-
+    length(Board, Size),
+    Dim is floor(sqrt(Size)).
 
-restrict_board([Cell | RestBoard], TopRow, BottomRow, RightRow, LeftRow) :-
+restrict_board([], _, _, _, _, _).
+
+restrict_board([Cell | RestBoard], Dim, TopRow, BottomRow, RightRow, LeftRow) :-
 
     Cell = cell(Row, Col, Val),
 
@@ -57,59 +44,68 @@ restrict_board([Cell | RestBoard], TopRow, BottomRow, RightRow, LeftRow) :-
     element(Row, LeftRow,   LRVal),
 
     Row #=< TRVal #<=> ResTR,
-    Row #>= (4 + 1 - BRVal) #<=> ResBR,
+    Row #>= (Dim + 1 - BRVal) #<=> ResBR,
 
     Col #=< LRVal #<=> ResLR,
-    Col #>= (4 + 1 - RRVal) #<=> ResRR,
+    Col #>= (Dim + 1 - RRVal) #<=> ResRR,
 
+    LRD1 is Row - Col,
+    ((LRD1 > 0,  LRD1 < (Dim+1)), !,
+        element(LRD1, LeftRow, LRD1Val),
+        Col #=< LRD1Val #<=> ResLD1
+    ;
+    ResLD1 #= 0),
 
+    LRD2 is Col + Row,
+    ((LRD2 > 0, LRD2 < (Dim+1)), !,
+        element(LRD2, LeftRow, LRD2Val),
+        Col #=< LRD2Val #<=> ResLD2
+    ;
+    ResLD2 #= 0),
 
-    LRD1 in 1..4,
-    LRD1 #= -Col + Row,
-    element(LRD1, LeftRow, LRD1Val),
-    Col #=< LRD1Val,
+    RRD1 is (Dim+1) - Col + Row,
+    ((RRD1 > 0, RRD1 < (Dim+1)), !,
+        element(RRD1, RightRow, RRD1Val),
+        Col #>= ((Dim+1) - RRD1Val) #<=> ResRD1
+    ;
+    ResRD1 #= 0),
 
-    LRD2 in 1..4,
-    LRD2 #= Col + Row,
-    element(LRD2, LeftRow,  LRD2Val),
-    Col #=< LRD2Val,
+    RRD2 is Col + Row - (Dim+1),
+    ((RRD2 > 0, RRD2 < (Dim+1)), !,
+        element(RRD2, RightRow, RRD2Val),
+        Col #>= ((Dim+1) - RRD2Val) #<=> ResRD2
+    ;
+    ResRD2 #= 0),
 
+    TRD1 is Col - Row,
+    ((TRD1 > 0, TRD1 < (Dim+1)), !,
+        element(TRD1, TopRow, TRD1Val),
+        Row #=< TRD1Val #<=> ResTD1
+    ;
+    ResTD1 #= 0),
 
-    RRD1 in 1..4,
-    RRD1 #= 4 + 1 - Col + Row,
-    element(RRD1, RightRow, RRD1Val),
-    Col #>= (4 + 1 - RRD1Val),
+    TRD2 is Col + Row,
+    ((TRD2 > 0, TRD2 < (Dim+1)), !,
+        element(TRD2, TopRow, TRD2Val),
+        Row #=< TRD2Val #<=> ResTD2
+    ;
+    ResTD2 #= 0),
 
-    RRD2 in 1..4,
-    RRD2 #= - (4 + 1) + Col + Row,
-    element(RRD2, RightRow, RRD2Val),
-    Col #>= (4 + 1 - RRD2Val),
+    BRD1 is (4 + 1) - Row + Col,
+    ((BRD1 > 0, BRD1 < Dim+1), !,
+        element(BRD1, BottomRow, BRD1Val),
+        Row #>= ((Dim+1) - BRD1Val) #<=> ResBD1
+    ;
+    ResBD1 #= 0),
 
+    BRD2 is Row + Col -(Dim+1),
+    ((BRD2 > 0 , BRD2 < Dim+1), !,
+        element(BRD2, BottomRow, BRD2Val),
+        Row #>= ((Dim+1) - BRD2Val) #<=> ResBD2
+    ;
+    ResBD2 #= 0),
 
+    Val #= ResTR + ResBR + ResRR + ResLR + ResLD1 + ResLD2 + ResRD1 + ResRD2 + ResTD1 + ResTD2 + ResBD1 + ResBD2,
 
-    TRD1 in 1..4,
-    TRD1 #= - Row + Col,
-    element(TRD1, TopRow, TRD1Val),
-    Row #=< TRD1Val,
-
-    TRD2 in 1..4,
-    TRD2 #= Col + Row,
-    element(TRD2, TopRow, TRD2Val),
-    Row #=< TRD2Val,
-
-
-    BRD1 in 1..4,
-    BRD1 #= (N + 1) - Row + Col,
-    element(BRD1, BottomRow, BRD1Val),
-    Row #>= (4 + 1 - BRD1Val),
-
-    BRD2 in 1..4,
-    BRD2 #= -(N + 1) + Row + Col,
-    element(BRD2, BottomRow, BRD2Val),
-    Row #>= (4 + 1 - BRD2Val),
-
-
-    Val #= ResTR + ResBR + ResRR + ResLR + LRD1 + LRD2 + RRD1 + RRD2 + TRD1 + TRD2 + BRD1 + BRD2,
-
-    restrict_board(RestBoard, TopRow, BottomRow, RightRow, LeftRow).
+    restrict_board(RestBoard, Dim, TopRow, BottomRow, RightRow, LeftRow).
 
