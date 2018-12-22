@@ -28,8 +28,8 @@ generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board):-
     varBoard(Board, Dim),
     restrict_board(Board, Dim, TopRow, BottomRow, RightRow, LeftRow).
 
-solve(Board, TopRow, BottomRow, RightRow, LeftRow) :-
-    statistics(runtime, [T1|_]),
+
+solve(Board, TopRow, BottomRow, RightRow, LeftRow, Options, Time) :-
     getBoardDim(Board, Dim),
     
     length(TopRow, Dim),      domain(TopRow, 0, Dim),
@@ -38,19 +38,13 @@ solve(Board, TopRow, BottomRow, RightRow, LeftRow) :-
     length(LeftRow, Dim),     domain(LeftRow, 0, Dim),
 
     restrict_board(Board, Dim, TopRow, BottomRow, RightRow, LeftRow),
-
     append([TopRow, BottomRow, RightRow, LeftRow], List),
-    labeling([], List),
-    write('Result: '),
-    write(List),
-    nl,
 
+    statistics(runtime, [T1|_]),
+    labeling(Options, List),
     statistics(runtime, [T2|_]),
-    T3 is T2 - T1,
-    write('Time: '),
-    write(T3),
-    write(' ms'),
-    nl,nl.
+    Time is T2 - T1.
+
 
 getBoardDim(Board, Dim) :-
     length(Board, Size),
