@@ -110,7 +110,7 @@ restrict_board([Cell | RestBoard], Dim, TopRow, BottomRow, RightRow, LeftRow) :-
     ;
     ResTD2 #= 0),
 
-    BRD1 is (4 + 1) - Row + Col,
+    BRD1 is (Dim + 1) - Row + Col,
     ((BRD1 > 0, BRD1 < Dim+1), !,
         element(BRD1, BottomRow, BRD1Val),
         Row #>= ((Dim+1) - BRD1Val) #<=> ResBD1
