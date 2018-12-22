@@ -39,7 +39,8 @@ testAll(Board) :-
                     member(O, Order_op), 
                     member(B, Branching_op),
                     Options = [S, O, B],
-                    solve(Board, _, _, _, _, Options, Time)
+                    solve(Board, _, _, _, _, [time_out(5000, success) | Options], Time),
+                    write(Options), write(' - '), write(Time), nl
                     ),
                 List),
                 

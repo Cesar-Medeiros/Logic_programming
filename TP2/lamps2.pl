@@ -11,12 +11,12 @@ full(Dim) :-
     nl,nl,
     printBoardRepresentation(Board),
     nl,nl,
-    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1),
+    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1, [], Time),
+    write(Time),
     printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
 
 generateRandomList(List, Length) :-
     findall(Val, (between(1, Length, _), random(0, Length, Val)), List).
-
 
 
 generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board):-
@@ -43,7 +43,7 @@ solve(Board, TopRow, BottomRow, RightRow, LeftRow, Options, Time) :-
     statistics(runtime, [T1|_]),
     labeling(Options, List),
     statistics(runtime, [T2|_]),
-    Time is T2 - T1.
+    Time is T2 - T1, !.
 
 
 getBoardDim(Board, Dim) :-
