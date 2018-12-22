@@ -1,11 +1,34 @@
 :-use_module(library(clpfd)).
 :-use_module(library(lists)).
+:-use_module(library(random)).
+
 :- consult(boards).
+:- consult(display).
 
-% getBoard([[4, 6, 6, 5],[5, 2, 6, 4],[4, 6, 6, 6],[4, 6, 6, 4]]).
+full(Dim) :-
+    generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board),
+    printBoard(Board-[Dim, Dim], TopRow, BottomRow, RightRow, LeftRow),
+    nl,nl,
+    printBoardRepresentation(Board),
+    nl,nl,
+    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1),
+    printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
+
+generateRandomList(List, Length) :-
+    findall(Val, (between(1, Length, _), random(0, Length, Val)), List).
 
 
-solve(Board) :-
+
+generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board):-
+    generateRandomList(TopRow,    Dim),
+    generateRandomList(BottomRow, Dim),
+    generateRandomList(RightRow,  Dim),
+    generateRandomList(LeftRow,   Dim),
+
+    varBoard(Board, Dim),
+    restrict_board(Board, Dim, TopRow, BottomRow, RightRow, LeftRow).
+
+solve(Board, TopRow, BottomRow, RightRow, LeftRow) :-
     statistics(runtime, [T1|_]),
     getBoardDim(Board, Dim),
     
@@ -25,7 +48,9 @@ solve(Board) :-
     statistics(runtime, [T2|_]),
     T3 is T2 - T1,
     write('Time: '),
-    write(T3).
+    write(T3),
+    write(' ms'),
+    nl,nl.
 
 getBoardDim(Board, Dim) :-
     length(Board, Size),
