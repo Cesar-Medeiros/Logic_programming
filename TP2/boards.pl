@@ -1,6 +1,13 @@
 :-use_module(library(lists)).
 :-use_module(library(between)).
 
+board_2x2([
+    cell(1, 1, 0),
+    cell(1, 2, 0),
+    cell(2, 1, 0),
+    cell(2, 2, 0)
+]).
+
 board_4x4([
         cell(1, 1, 4),
         cell(1, 2, 6),
