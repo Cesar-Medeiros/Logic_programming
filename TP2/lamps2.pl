@@ -7,13 +7,13 @@
 
 full(Dim) :-
     generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board),
-    printBoard(Board-[Dim, Dim], TopRow, BottomRow, RightRow, LeftRow),
+    % printBoard(Board-[Dim, Dim], TopRow, BottomRow, RightRow, LeftRow),
     nl,nl,
-    printBoardRepresentation(Board),
+    % printBoardRepresentation(Board),
     nl,nl,
-    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1, [], Time),
-    write(Time),
-    printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
+    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1, [anti_first_fail, down, bisect], Time),
+    write(Time),write(' ms'),nl.
+    % printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
 
 generateRandomList(List, Length) :-
     findall(Val, (between(1, Length, _), random(0, Length, Val)), List).
@@ -110,7 +110,7 @@ restrict_board([Cell | RestBoard], Dim, TopRow, BottomRow, RightRow, LeftRow) :-
     ;
     ResTD2 #= 0),
 
-    BRD1 is (4 + 1) - Row + Col,
+    BRD1 is (Dim + 1) - Row + Col,
     ((BRD1 > 0, BRD1 < Dim+1), !,
         element(BRD1, BottomRow, BRD1Val),
         Row #>= ((Dim+1) - BRD1Val) #<=> ResBD1

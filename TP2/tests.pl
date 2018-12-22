@@ -39,8 +39,9 @@ testAll(Board) :-
                     member(O, Order_op), 
                     member(B, Branching_op),
                     Options = [S, O, B],
-                    solve(Board, _, _, _, _, [time_out(5000, success) | Options], Time),
-                    write(Options), write(' - '), write(Time), nl
+                    between(1, 5, _),
+                    solve(Board, _, _, _, _, [time_out(5000, Flag) | Options], Time),
+                    write(Options), write(' - '), write(Time), write(' - ') , write(Flag), nl
                     ),
                 List),
                 
