@@ -1,4 +1,4 @@
-:- consult(lamps_1).
+:- consult(lamps).
 :- consult(display).
 
 generateRandomList(List, Length) :-

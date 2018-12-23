@@ -1,5 +1,5 @@
 :-use_module(library(aggregate)).
-:- consult(lamps_1).
+:- consult(lamps).
 :- consult(csv).
 
 
