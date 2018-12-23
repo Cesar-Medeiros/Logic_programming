@@ -1,11 +1,14 @@
 :-use_module(library(lists)).
 :-use_module(library(aggregate)).
+
 :- consult(boards).
 
 
 printBoard(Board, TopRow, BottomRow, RightRow, LeftRow) :-
-        _-[Rows, Cols] = Board,
-
+        getBoardDim(Board, Dim),
+        
+        Rows = Dim,
+        Cols = Dim,
 
         % printChar(0x0020, 4),
         % printFirstLine([Rows, Cols]),

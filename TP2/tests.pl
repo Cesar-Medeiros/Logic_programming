@@ -1,3 +1,4 @@
+:-use_module(library(aggregate)).
 :- consult(lamps_1).
 :- consult(csv).
 
@@ -28,8 +29,8 @@ branching_op([
 
 
 
-testAll(Board) :-
-
+test(Board) :-
+    
     selection_strategy_op(Selection_op),
     value_order_op(Order_op),
     branching_op(Branching_op),
@@ -46,6 +47,6 @@ testAll(Board) :-
                 List),
                 
 
-    open_test_csv(Stream),
+    open_test_csv('test.csv', Stream),
     forall(member(Options-Time, List), save_test_csv(Stream, Options, Time)),
     close(Stream).

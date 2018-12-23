@@ -8,5 +8,5 @@ save_test_csv(Stream, [Op1, Op2, Op3], Time) :-
     write_to_codes(Op3, CodeList3),
     write_record(Stream, [string(CodeList1), string(CodeList2), string(CodeList3), integer(Time)]).
 
-open_test_csv(Stream) :-
-    open('test.csv', write, Stream).
+open_test_csv(FileName, Stream) :-
+    open(FileName, write, Stream).

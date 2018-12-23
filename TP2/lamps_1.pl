@@ -2,32 +2,7 @@
 :-use_module(library(lists)).
 :-use_module(library(random)).
 
-:- consult(boards).
-:- consult(display).
-
-full(Dim) :-
-    generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board),
-    printBoard(Board-[Dim, Dim], TopRow, BottomRow, RightRow, LeftRow),
-    nl,nl,
-    printBoardRepresentation(Board),
-    nl,nl,
-    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1, [], Time),
-    write(Time),write(' ms'),nl,
-    printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
-
-generateRandomList(List, Length) :-
-    findall(Val, (between(1, Length, _), random(0, Length, Val)), List).
-
-
-generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board):-
-    generateRandomList(TopRow,    Dim),
-    generateRandomList(BottomRow, Dim),
-    generateRandomList(RightRow,  Dim),
-    generateRandomList(LeftRow,   Dim),
-
-    varBoard(Board, Dim),
-    restrict_board(Board, Dim, TopRow, BottomRow, RightRow, LeftRow).
-
+:-consult(boards).
 
 solve(Board, TopRow, BottomRow, RightRow, LeftRow, Options, Time) :-
     getBoardDim(Board, Dim),
@@ -39,7 +14,7 @@ solve(Board, TopRow, BottomRow, RightRow, LeftRow, Options, Time) :-
 
     restrict_board(Board, Dim, TopRow, BottomRow, RightRow, LeftRow),
     append([TopRow, BottomRow, RightRow, LeftRow], List),
-
+    
     statistics(runtime, [T1|_]),
     labeling(Options, List),
     statistics(runtime, [T2|_]),
@@ -127,4 +102,3 @@ restrict_board([Cell | RestBoard], Dim, TopRow, BottomRow, RightRow, LeftRow) :-
     Val #= ResTR + ResBR + ResRR + ResLR + ResLD1 + ResLD2 + ResRD1 + ResRD2 + ResTD1 + ResTD2 + ResBD1 + ResBD2,
 
     restrict_board(RestBoard, Dim, TopRow, BottomRow, RightRow, LeftRow).
-
