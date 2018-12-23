@@ -7,13 +7,13 @@
 
 full(Dim) :-
     generateBoard(Dim, TopRow, BottomRow, RightRow, LeftRow, Board),
-    % printBoard(Board-[Dim, Dim], TopRow, BottomRow, RightRow, LeftRow),
+    printBoard(Board-[Dim, Dim], TopRow, BottomRow, RightRow, LeftRow),
     nl,nl,
-    % printBoardRepresentation(Board),
+    printBoardRepresentation(Board),
     nl,nl,
-    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1, [anti_first_fail, down, bisect], Time),
-    write(Time),write(' ms'),nl.
-    % printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
+    solve(Board, TopRow1, BottomRow1, RightRow1, LeftRow1, [], Time),
+    write(Time),write(' ms'),nl,
+    printBoard(Board-[Dim, Dim], TopRow1, BottomRow1, RightRow1, LeftRow1).
 
 generateRandomList(List, Length) :-
     findall(Val, (between(1, Length, _), random(0, Length, Val)), List).

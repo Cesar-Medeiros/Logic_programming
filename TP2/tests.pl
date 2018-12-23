@@ -1,4 +1,4 @@
-:- consult(lamps2).
+:- consult(lamps_1).
 :- consult(csv).
 
 
