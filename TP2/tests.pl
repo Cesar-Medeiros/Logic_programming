@@ -30,7 +30,6 @@ branching_op([
 
 
 test(Board) :-
-    
     selection_strategy_op(Selection_op),
     value_order_op(Order_op),
     branching_op(Branching_op),

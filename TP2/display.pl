@@ -6,12 +6,12 @@
 
 printBoard(Board, TopRow, BottomRow, RightRow, LeftRow) :-
         getBoardDim(Board, Dim),
-        
+
         Rows = Dim,
         Cols = Dim,
 
-        % printChar(0x0020, 4),
-        % printFirstLine([Rows, Cols]),
+        printChar(0x0020, 4),
+        printFirstHorOutLine(Cols),
 
         printChar(0x0020, 4),
         printHorOutLine(TopRow),
@@ -45,9 +45,11 @@ printBoard(Board, TopRow, BottomRow, RightRow, LeftRow) :-
         )),
 
         printChar(0x0020, 4),
-        printHorOutLine(BottomRow)
-        % printChar(0x0020, 4),
-        % printFinalLine([Rows, Cols])
+        printHorOutLine(BottomRow),
+
+        printChar(0x0020, 4),
+        printFinalHorOutLine(Cols),
+        !
         .
 
 
@@ -72,8 +74,39 @@ printLine(Board, Row, [_, Cols]) :-
                 )
               ).
 
-% printLine(+Line)
-%   Print a line decorated
+% printFirstHorOutLine(+Line)
+%   Prints first decorative line
+printFirstHorOutLine(Cols) :- 
+        
+        printChar(0x250F, 1),
+        printChar(0x2501, 3),
+
+        N is Cols - 1,
+        forall(between(1, N, _), 
+                (printChar(0x2533, 1), 
+                 printChar(0x2501, 3)) 
+              ),
+        printChar(0x2513, 1),
+        nl.
+
+% printFinalHorOutLine(+Line)
+%   Prints final decorative line
+printFinalHorOutLine(Cols) :- 
+        
+        printChar(0x2517, 1),
+        printChar(0x2501, 3),
+
+        N is Cols - 1,
+        forall(between(1, N, _), 
+                (printChar(0x253B, 1), 
+                 printChar(0x2501, 3)) 
+              ),
+        printChar(0x251B, 1),
+        nl.
+
+
+% printHorOutLine(+Line)
+%   Print a Horizontal line decorated
 printHorOutLine(List) :- 
         put_code(0x2503),
         put_code(0x0020),
@@ -88,7 +121,7 @@ printHorOutLine(List) :-
                 (Index == Len -> 
                         put_code(0x2503), ! 
                         ; 
-                        (put_code(0x2502),
+                        (put_code(0x2503),
                         put_code(0x0020)))
               
                 )
@@ -107,7 +140,7 @@ printFirstLine([_, Cols]) :-
 
         N is Cols - 1,
         forall(between(1, N, _), 
-                (printChar(0x253F, 1), 
+                (printChar(0x2547, 1), 
                  printChar(0x2501, 3)) 
               ),
 
@@ -148,7 +181,7 @@ printFinalLine([_, Cols]) :-
 
         N is Cols - 1,
         forall(between(1, N, _), 
-                (printChar(0x253F, 1),
+                (printChar(0x2548, 1),
                 printChar(0x2501, 3))
                 ),      
         
